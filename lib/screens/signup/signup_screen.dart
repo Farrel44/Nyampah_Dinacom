@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:nyampah_app/screens/login/login_screen.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+
+class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({Key? key}) : super(key: key);
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<SignUpScreen> createState() => _SignUpScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   bool passwordVisibility = false;
 
   @override
-
 
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -133,7 +134,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         TextButton(
                           onPressed: () {
-                            Navigator.pushNamed(context, '/login');
+                            Navigator.push(context, 
+                            MaterialPageRoute(builder: (context) => const LoginScreen()));
                           },
                           child: Text(
                             'Sign In',
@@ -222,5 +224,4 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
-
 
