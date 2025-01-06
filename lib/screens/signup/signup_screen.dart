@@ -23,6 +23,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         FocusScope.of(context).unfocus();
       },
       child: Scaffold(
+        resizeToAvoidBottomInset: true,
         backgroundColor: const Color(0xFFF5F4ED),
         body: SafeArea(
           child: LayoutBuilder(
@@ -69,6 +70,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             label: 'Username',
                             controller: usernameController,
                             scale: scale,
+                            
                           ),
                           SizedBox(height: 20 * scale),
                           buildInputField(
@@ -136,7 +138,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           onPressed: () {
                             Navigator.push(context, 
                             MaterialPageRoute(builder: (context) => const LoginScreen()));
-                          },
+                          },  
                           child: Text(
                             'Sign In',
                             style: TextStyle(
