@@ -67,13 +67,19 @@ class _ProfilePageState extends State<ProfilePage> {
                               ),
                               Row(
                                 children: [
-                                  Text(
-                                    "{username}",
-                                    style: TextStyle(
-                                        color: leaderBoardTitleColor,
-                                        fontFamily: 'Inter',
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: constraints.maxWidth * 0.05),
+                                  GestureDetector(
+                                    onTap: () {
+                                      //logic
+                                    },
+                                    child: Text(
+                                      "Edit Profil",
+                                      style: TextStyle(
+                                          color: leaderBoardTitleColor,
+                                          fontFamily: 'Inter',
+                                          fontWeight: FontWeight.bold,
+                                          fontSize:
+                                              constraints.maxWidth * 0.05),
+                                    ),
                                   ),
                                   SizedBox(width: constraints.maxWidth * 0.01),
                                   SvgPicture.asset(
