@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nyampah_app/screens/home/home_screen.dart';
+import 'package:nyampah_app/screens/home/profile_screen.dart';
 import 'screens/onboarding/onboarding_screen.dart';
 
 void main() {
@@ -14,7 +15,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: const HomePage(),
+      home: const ProfilePage(),
     );
   }
 }
