@@ -7,3 +7,4 @@ const darkGreenColor = Color(0xff0B2027);
 const backgroundColor = Color(0xffF3F1E8);
 const greenWhite = Color(0xffE1EBE7);
 const leaderBoardTitleColor = Color(0xffFFB304);
+const darkRed = Color(0xff990000);
