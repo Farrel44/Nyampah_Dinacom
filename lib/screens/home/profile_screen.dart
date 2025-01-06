@@ -99,7 +99,214 @@ class _ProfilePageState extends State<ProfilePage> {
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(8),
                 ),
-              )
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              SvgPicture.asset(
+                                'assets/images/setting.svg',
+                                width: constraints.maxWidth * 0.07,
+                              ),
+                              SizedBox(width: constraints.maxWidth * 0.03),
+                              const Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Pengaturan akun & aplikasi',
+                                    style: TextStyle(
+                                        fontFamily: 'Inter',
+                                        fontWeight: FontWeight.bold,
+                                        color: greenColor,
+                                        fontSize: 13),
+                                  ),
+                                  Text(
+                                    'Kontrol pengaturan aplikasi, data, dan lainnya.',
+                                    style: TextStyle(
+                                        fontFamily: 'Inter',
+                                        color: greenWithOpacity,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 10),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(width: constraints.maxWidth * 0.06),
+                              const Icon(
+                                Icons.chevron_right,
+                                color: greenWithOpacity,
+                              )
+                            ],
+                          ),
+                          Divider(
+                            height: constraints.maxWidth * 0.08,
+                            color: greenWithOpacity,
+                          ),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              SvgPicture.asset(
+                                'assets/images/setting.svg',
+                                width: constraints.maxWidth * 0.07,
+                              ),
+                              SizedBox(width: constraints.maxWidth * 0.03),
+                              const Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Tentang Kami',
+                                    style: TextStyle(
+                                        fontFamily: 'Inter',
+                                        fontWeight: FontWeight.bold,
+                                        color: greenColor,
+                                        fontSize: 13),
+                                  ),
+                                  Text(
+                                    'Ikuti kami di sosial media, website, dan lainnya.',
+                                    style: TextStyle(
+                                        fontFamily: 'Inter',
+                                        color: greenWithOpacity,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 10),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(width: constraints.maxWidth * 0.05),
+                              const Icon(
+                                Icons.chevron_right,
+                                color: greenWithOpacity,
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+              SizedBox(height: basePadding),
+              Container(
+                width: size.width,
+                height: size.height * 0.15,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              SvgPicture.asset(
+                                'assets/images/setting.svg',
+                                width: constraints.maxWidth * 0.07,
+                              ),
+                              SizedBox(width: constraints.maxWidth * 0.03),
+                              const Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Voucherku',
+                                    style: TextStyle(
+                                        fontFamily: 'Inter',
+                                        fontWeight: FontWeight.bold,
+                                        color: greenColor,
+                                        fontSize: 13),
+                                  ),
+                                  Text(
+                                    'Semua voucher kamu ada di sini!',
+                                    style: TextStyle(
+                                        fontFamily: 'Inter',
+                                        color: greenWithOpacity,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 10),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(width: constraints.maxWidth * 0.25),
+                              const Icon(
+                                Icons.chevron_right,
+                                color: greenWithOpacity,
+                              )
+                            ],
+                          ),
+                          Divider(
+                            height: constraints.maxWidth * 0.08,
+                            color: greenWithOpacity,
+                          ),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              SvgPicture.asset(
+                                'assets/images/setting.svg',
+                                width: constraints.maxWidth * 0.07,
+                              ),
+                              SizedBox(width: constraints.maxWidth * 0.03),
+                              const Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Track Sampah',
+                                    style: TextStyle(
+                                        fontFamily: 'Inter',
+                                        fontWeight: FontWeight.bold,
+                                        color: greenColor,
+                                        fontSize: 13),
+                                  ),
+                                  Text(
+                                    'data sampah yang udah kamu scan di sini!',
+                                    style: TextStyle(
+                                        fontFamily: 'Inter',
+                                        color: greenWithOpacity,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 10),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(width: constraints.maxWidth * 0.12),
+                              const Icon(
+                                Icons.chevron_right,
+                                color: greenWithOpacity,
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+              SizedBox(height: size.height * 0.2),
+              SizedBox(
+                width: size.width,
+                height: size.height * 0.06,
+                child: ElevatedButton(
+                  onPressed: () {},
+                  child: Text(
+                    'Keluar',
+                    style: TextStyle(
+                        fontFamily: 'Inter',
+                        fontSize: size.width * 0.045,
+                        fontWeight: FontWeight.bold),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: darkRed,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
         ),
