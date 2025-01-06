@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nyampah_app/screens/login/login_screen.dart';
 
-
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({Key? key}) : super(key: key);
 
@@ -16,7 +15,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
   bool passwordVisibility = false;
 
   @override
-
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
@@ -36,7 +34,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   mainAxisSize: MainAxisSize.max,
                   children: [
                     Padding(
-                      padding: EdgeInsetsDirectional.symmetric(vertical: 25 * scale),
+                      padding:
+                          EdgeInsetsDirectional.symmetric(vertical: 25 * scale),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -70,7 +69,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             label: 'Username',
                             controller: usernameController,
                             scale: scale,
-                            
                           ),
                           SizedBox(height: 20 * scale),
                           buildInputField(
@@ -136,9 +134,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         ),
                         TextButton(
                           onPressed: () {
-                            Navigator.push(context, 
-                            MaterialPageRoute(builder: (context) => const LoginScreen()));
-                          },  
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => const LoginScreen()));
+                          },
                           child: Text(
                             'Sign In',
                             style: TextStyle(
@@ -226,4 +226,3 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 }
-

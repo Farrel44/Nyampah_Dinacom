@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:nyampah_app/screens/home/edit_screen.dart';
 import 'package:nyampah_app/theme/colors.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -69,7 +70,12 @@ class _ProfilePageState extends State<ProfilePage> {
                                 children: [
                                   GestureDetector(
                                     onTap: () {
-                                      //logic
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const EditProfile(),
+                                        ),
+                                      );
                                     },
                                     child: Text(
                                       "Edit Profil",
@@ -319,4 +325,6 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
     );
   }
+
+  void pushNavigate(BuildContext context) {}
 }

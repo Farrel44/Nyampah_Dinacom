@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+
 import 'package:nyampah_app/theme/colors.dart';
 
 class EditProfile extends StatefulWidget {
@@ -13,6 +16,21 @@ class _EditProfileState extends State<EditProfile> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
+  File? image;
+
+  Future<void> pickImage() async {
+    try {
+      final pickedImage =
+          await ImagePicker().pickImage(source: ImageSource.gallery);
+      if (pickedImage == null) return;
+      setState(() {
+        image = File(pickedImage.path);
+      });
+    } catch (e) {
+      print("Error picking image: $e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -24,10 +42,15 @@ class _EditProfileState extends State<EditProfile> {
       backgroundColor: backgroundColor,
       appBar: AppBar(
         backgroundColor: backgroundColor,
-        leading: Icon(
-          Icons.chevron_left,
-          color: greenColor,
-          size: size.width * 0.1,
+        leading: GestureDetector(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: Icon(
+            Icons.chevron_left,
+            color: greenColor,
+            size: size.width * 0.1,
+          ),
         ),
       ),
       body: SafeArea(
@@ -41,31 +64,31 @@ class _EditProfileState extends State<EditProfile> {
                   alignment: Alignment.center,
                   children: [
                     ClipOval(
-                      child: Image.asset(
-                        'assets/images/placeholder_image.png',
-                        fit: BoxFit.cover,
-                        width: profileSize,
-                        height: profileSize,
-                      ),
+                      child: image != null
+                          ? Image.file(
+                              image!,
+                              fit: BoxFit.cover,
+                              width: profileSize,
+                              height: profileSize,
+                            )
+                          : Image.asset(
+                              'assets/images/placeholder_image.png',
+                              fit: BoxFit.cover,
+                              width: profileSize,
+                              height: profileSize,
+                            ),
                     ),
                     Positioned(
                       bottom: 0,
                       right: 0,
                       child: GestureDetector(
-                        onTap: () {},
+                        onTap: pickImage,
                         child: Container(
                           width: editButtonSize,
                           height: editButtonSize,
                           decoration: const BoxDecoration(
                             shape: BoxShape.circle,
                             color: Colors.white,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black26,
-                                blurRadius: 5,
-                                offset: Offset(2, 2),
-                              ),
-                            ],
                           ),
                           child: Icon(
                             Icons.edit,
@@ -79,7 +102,7 @@ class _EditProfileState extends State<EditProfile> {
                 ),
                 const SizedBox(height: 30),
                 Container(
-                  width: size.width, // Takes full width
+                  width: size.width,
                   padding: EdgeInsets.all(basePadding),
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -111,7 +134,9 @@ class _EditProfileState extends State<EditProfile> {
                       width: size.width / 3,
                       height: size.height * 0.045,
                       child: ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          // Submit action logic here
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
