@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:nyampah_app/theme/colors.dart';
-import 'package:nyampah_app/theme/navbar.dart';
 
 class VoucherPage extends StatefulWidget {
   const VoucherPage({super.key});
@@ -132,16 +131,6 @@ class VoucherPageState extends State<VoucherPage> {
                   ),
                 );
               },
-            ),
-          ),
-          // Floating Bottom Navigation
-          Positioned(
-            bottom: 20,
-            left: 20,
-            right: 20,
-            child: FloatingBottomNav(
-              selectedIndex: 0,
-              onTap: (p0) {},
             ),
           ),
         ],
