@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:nyampah_app/screens/signup/signup_screen.dart';
+
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -14,6 +16,7 @@ class _LoginScreenState extends State<LoginScreen> {
   bool passwordVisibility = false;
 
 @override
+
 Widget build(BuildContext context) {
   return GestureDetector(
     onTap: () {
@@ -65,13 +68,6 @@ Widget build(BuildContext context) {
                         children: [
                           buildInputField(
                             context,
-                            label: 'Username',
-                            controller: usernameController,
-                            scale: scale,
-                          ),
-                          SizedBox(height: 20 * scale),
-                          buildInputField(
-                            context,
                             label: 'Email',
                             controller: emailController,
                             scale: scale,
@@ -109,7 +105,7 @@ Widget build(BuildContext context) {
                           ),
                         ),
                         child: Text(
-                          'Sign Up',
+                          'Sign In',
                           style: TextStyle(
                             fontFamily: 'Inter Tight',
                             color: Colors.white,
@@ -123,7 +119,7 @@ Widget build(BuildContext context) {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            'Already have an account?',
+                            'Dont have an account?',
                             style: TextStyle(
                               fontFamily: 'Inter',
                               color: const Color(0xFF00693E),
@@ -132,10 +128,11 @@ Widget build(BuildContext context) {
                           ),
                           TextButton(
                             onPressed: () {
-                              Navigator.pushNamed(context, '/login');
+                              Navigator.push(context,
+                              MaterialPageRoute(builder: (context) => const SignUpScreen()));
                             },
                             child: Text(
-                              'Sign In',
+                              'Sign Up',
                               style: TextStyle(
                                 fontFamily: 'Inter',
                                 color: const Color(0xFFFF8302),
