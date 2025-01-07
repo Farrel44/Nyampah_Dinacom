@@ -2,20 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:nyampah_app/theme/colors.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
-    // Get screen size
     final size = MediaQuery.of(context).size;
 
-    // Calculate responsive dimensions
     final double paddingScale = size.width * 0.02;
     final double basePadding = paddingScale.clamp(16.0, 24.0);
 
@@ -23,7 +21,6 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: backgroundColor,
       body: LayoutBuilder(
         builder: (context, constraints) {
-          // Calculate responsive text sizes
           final double welcomeTextSize =
               (constraints.maxWidth * 0.045).clamp(16.0, 18.0);
           final double usernameTextSize =

@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:nyampah_app/screens/home/home_screen.dart';
 import 'package:nyampah_app/screens/login/login_screen.dart';
+import 'package:nyampah_app/services/api_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 
 
 class SignUpScreen extends StatefulWidget {
@@ -96,8 +100,54 @@ Widget build(BuildContext context) {
                       ),
                       SizedBox(height: 20 * scale),
                       ElevatedButton(
-                        onPressed: () {
-                          print('Sign Up pressed');
+                        onPressed: () async {
+                          final name = usernameController.text.trim();
+                          final email = emailController.text.trim();
+                          final password = passwordController.text;
+
+                          if (name.isEmpty || email.isEmpty || password.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Please fill in all fields')),
+                            );
+                            return;
+                          }
+
+                          final passwordRegex = RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$');
+                          if (!passwordRegex.hasMatch(password)) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  'Password must be at least 8 characters long, include 1 lowercase letter, '
+                                  '1 uppercase letter, and 1 number.',
+                                ),
+                              ),
+                            );
+                            return;
+                          }
+
+                          try {
+                            final response = await ApiService.registerUser(name, email, password);
+
+                            final prefs = await SharedPreferences.getInstance();
+                            final user = response['data']['user'];
+                            final token = response['data']['token'];
+
+                            await prefs.setString('user', jsonEncode(user));
+                            await prefs.setString('token', token);
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Registration successful!')),
+                            );
+
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const HomePage()),
+                            );
+                          } catch (error) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Registration failed: $error')),
+                            );
+                          }
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF00693E),
@@ -228,4 +278,3 @@ Widget build(BuildContext context) {
     );
   }
 }
-
