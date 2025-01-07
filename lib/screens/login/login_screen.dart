@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:nyampah_app/screens/signup/signup_screen.dart';
-import 'package:nyampah_app/screens/home/home_screen.dart';
 import 'package:nyampah_app/services/api_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:nyampah_app/main.dart';
 import 'dart:convert';
-
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -19,177 +18,185 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController passwordController = TextEditingController();
   bool passwordVisibility = false;
 
-@override
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+      },
+      child: Scaffold(
+        resizeToAvoidBottomInset: true,
+        backgroundColor: const Color(0xFFF5F4ED),
+        body: SafeArea(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              double scale = constraints.maxWidth / 375;
+              double buttonWidth = constraints.maxWidth * 0.9;
+              return Align(
+                alignment: AlignmentDirectional.topCenter,
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20 * scale),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        Padding(
+                          padding: EdgeInsetsDirectional.symmetric(
+                              vertical: 25 * scale),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Welcome To Nyampah!',
+                                style: TextStyle(
+                                  fontFamily: 'Inter',
+                                  color: const Color(0xFF00693E),
+                                  fontSize: 30 * scale,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                'Please sign in first',
+                                style: TextStyle(
+                                  fontFamily: 'Inter',
+                                  color: const Color(0xFF00693E),
+                                  fontSize: 16 * scale,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Column(
+                          children: [
+                            buildInputField(
+                              context,
+                              label: 'Email',
+                              controller: emailController,
+                              scale: scale,
+                            ),
+                            SizedBox(height: 20 * scale),
+                            buildInputField(
+                              context,
+                              label: 'Password',
+                              controller: passwordController,
+                              isPassword: true,
+                              passwordVisibility: passwordVisibility,
+                              onVisibilityToggle: () {
+                                setState(() {
+                                  passwordVisibility = !passwordVisibility;
+                                });
+                              },
+                              scale: scale,
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 20 * scale),
+                        ElevatedButton(
+                          onPressed: () async {
+                            final email = emailController.text.trim();
+                            final password = passwordController.text;
 
-Widget build(BuildContext context) {
-  return GestureDetector(
-    onTap: () {
-      FocusScope.of(context).unfocus();
-    },
-    child: Scaffold(
-      resizeToAvoidBottomInset: true,
-      backgroundColor: const Color(0xFFF5F4ED),
-      body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            double scale = constraints.maxWidth / 375;
-            double buttonWidth = constraints.maxWidth * 0.9;
-            return Align(
-              alignment: AlignmentDirectional.topCenter,
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20 * scale),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      Padding(
-                        padding: EdgeInsetsDirectional.symmetric(vertical: 25 * scale),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                            if (email.isEmpty || password.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text('Please fill in all fields')),
+                              );
+                              return;
+                            }
+
+                            try {
+                              final response =
+                                  await ApiService.loginUser(email, password);
+
+                              final prefs =
+                                  await SharedPreferences.getInstance();
+                              final user = response['data']['user'];
+                              final token = response['data']['token'];
+
+                              await prefs.setString('user', jsonEncode(user));
+                              await prefs.setString('token', token);
+
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text('Login successful!')),
+                              );
+
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => MainNavigator()),
+                              );
+                            } catch (error) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Login failed: $error')),
+                              );
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF00693E),
+                            minimumSize: Size(buttonWidth, 48 * scale),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 16.0 * scale,
+                              vertical: 12.0 * scale,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.0 * scale),
+                            ),
+                          ),
+                          child: Text(
+                            'Sign In',
+                            style: TextStyle(
+                              fontFamily: 'Inter Tight',
+                              color: Colors.white,
+                              fontSize: 15 * scale,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 20 * scale),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              'Welcome To Nyampah!',
+                              'Dont have an account?',
                               style: TextStyle(
                                 fontFamily: 'Inter',
                                 color: const Color(0xFF00693E),
-                                fontSize: 30 * scale,
-                                fontWeight: FontWeight.bold,
+                                fontSize: 14 * scale,
                               ),
                             ),
-                            Text(
-                              'Please sign in first',
-                              style: TextStyle(
-                                fontFamily: 'Inter',
-                                color: const Color(0xFF00693E),
-                                fontSize: 16 * scale,
-                                fontWeight: FontWeight.w500,
+                            TextButton(
+                              onPressed: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const SignUpScreen()));
+                              },
+                              child: Text(
+                                'Sign Up',
+                                style: TextStyle(
+                                  fontFamily: 'Inter',
+                                  color: const Color(0xFFFF8302),
+                                  fontSize: 14 * scale,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                           ],
                         ),
-                      ),
-                      Column(
-                        children: [
-                          buildInputField(
-                            context,
-                            label: 'Email',
-                            controller: emailController,
-                            scale: scale,
-                          ),
-                          SizedBox(height: 20 * scale),
-                          buildInputField(
-                            context,
-                            label: 'Password',
-                            controller: passwordController,
-                            isPassword: true,
-                            passwordVisibility: passwordVisibility,
-                            onVisibilityToggle: () {
-                              setState(() {
-                                passwordVisibility = !passwordVisibility;
-                              });
-                            },
-                            scale: scale,
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 20 * scale),
-                      ElevatedButton(
-                        onPressed: () async {
-                          final email = emailController.text.trim();
-                          final password = passwordController.text;
-
-                          if (email.isEmpty || password.isEmpty) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Please fill in all fields')),
-                            );
-                            return;
-                          }
-
-                          try {
-                            final response = await ApiService.loginUser(email, password);
-
-                            final prefs = await SharedPreferences.getInstance();
-                            final user = response['data']['user'];
-                            final token = response['data']['token'];
-
-                            await prefs.setString('user', jsonEncode(user));
-                            await prefs.setString('token', token);
-
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Login successful!')),
-                            );
-
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => const HomePage()),
-                            );
-                          } catch (error) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Login failed: $error')),
-                            );
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF00693E),
-                          minimumSize: Size(buttonWidth, 48 * scale),
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 16.0 * scale,
-                            vertical: 12.0 * scale,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8.0 * scale),
-                          ),
-                        ),
-                        child: Text(
-                          'Sign In',
-                          style: TextStyle(
-                            fontFamily: 'Inter Tight',
-                            color: Colors.white,
-                            fontSize: 15 * scale,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 20 * scale),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'Dont have an account?',
-                            style: TextStyle(
-                              fontFamily: 'Inter',
-                              color: const Color(0xFF00693E),
-                              fontSize: 14 * scale,
-                            ),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.push(context,
-                              MaterialPageRoute(builder: (context) => const SignUpScreen()));
-                            },
-                            child: Text(
-                              'Sign Up',
-                              style: TextStyle(
-                                fontFamily: 'Inter',
-                                color: const Color(0xFFFF8302),
-                                fontSize: 14 * scale,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 
   Widget buildInputField(
     BuildContext context, {
@@ -256,5 +263,3 @@ Widget build(BuildContext context) {
     );
   }
 }
-
-
