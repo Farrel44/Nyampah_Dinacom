@@ -41,6 +41,7 @@ class _EditProfileState extends State<EditProfile> {
     return Scaffold(
       backgroundColor: backgroundColor,
       appBar: AppBar(
+        scrolledUnderElevation: 0,
         backgroundColor: backgroundColor,
         leading: GestureDetector(
           onTap: () {

@@ -4,7 +4,7 @@ import 'package:nyampah_app/screens/home/home_screen.dart';
 import 'package:nyampah_app/screens/home/profile_screen.dart';
 import 'package:nyampah_app/screens/home/trash_tracker_screen.dart';
 import 'package:nyampah_app/screens/home/voucher_screen.dart';
-import 'screens/onboarding/onboarding_screen.dart';
+import 'package:nyampah_app/theme/navbar.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,7 +17,41 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: const TrashHistory(),
+      home: const HomeScreen(),
+    );
+  }
+}
+
+class MainNavigator extends StatefulWidget {
+  const MainNavigator({Key? key}) : super(key: key);
+
+  @override
+  _MainNavigatorState createState() => _MainNavigatorState();
+}
+
+class _MainNavigatorState extends State<MainNavigator> {
+  int _currentIndex = 1;
+
+  final List<Widget> _pages = [
+    const VoucherPage(),
+    const HomeScreen(),
+    const EditProfile(),
+    const ProfilePage(),
+    const TrashHistory(),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: _pages[_currentIndex],
+      bottomNavigationBar: FloatingBottomNav(
+        selectedIndex: _currentIndex,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+      ),
     );
   }
 }
