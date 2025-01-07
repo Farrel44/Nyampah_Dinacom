@@ -130,7 +130,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
                                   return Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         '${user?['rank'] ?? 'Rank'}',
@@ -142,7 +143,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                         ),
                                       ),
                                       SizedBox(
-                                          height: cardConstraints.maxHeight * 0.02),
+                                          height:
+                                              cardConstraints.maxHeight * 0.02),
                                       Text(
                                         '$points Points',
                                         style: TextStyle(
@@ -153,7 +155,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                         ),
                                       ),
                                       SizedBox(
-                                          height: cardConstraints.maxHeight * 0.1),
+                                          height:
+                                              cardConstraints.maxHeight * 0.1),
                                       ClipRRect(
                                         borderRadius: BorderRadius.circular(
                                             progressBarHeight * 0.5),
@@ -161,14 +164,16 @@ class _HomeScreenState extends State<HomeScreen> {
                                           width: double.infinity,
                                           height: progressBarHeight,
                                           child: LinearProgressIndicator(
-                                            value: (points / 1000).clamp(0.0, 1.0),
+                                            value:
+                                                (points / 1000).clamp(0.0, 1.0),
                                             color: greenColor,
                                             backgroundColor: greenWhite,
                                           ),
                                         ),
                                       ),
                                       SizedBox(
-                                          height: cardConstraints.maxHeight * 0.04),
+                                          height:
+                                              cardConstraints.maxHeight * 0.04),
                                       Text(
                                         '${1000 - (points % 1000)} Points Left',
                                         style: TextStyle(
