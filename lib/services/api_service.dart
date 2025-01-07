@@ -53,4 +53,39 @@ class ApiService {
       throw Exception('Failed to login: ${response.body}');
     }
   }
+
+  static Future<List<Map<String, dynamic>>> getLeaderboard(String token) async {
+    final url = Uri.parse('$baseUrl/leaderboard');
+
+    final response = await http.get(
+      url,
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> responseData = jsonDecode(response.body);
+
+      // Extract the "data" field
+      final List<dynamic> leaderboardData = responseData['data'][0];
+
+      // Map each leaderboard entry to a usable format
+      return leaderboardData.map<Map<String, dynamic>>((entry) {
+        return {
+          'name': entry['name'],
+          'email': entry['email'],
+          'profileImage': entry['profile_image'],
+          'points': entry['points'],
+          'rank': entry['rank'],
+          'uuid': entry['uuid'],
+          'exp': entry['exp'],
+        };
+      }).toList();
+    } else {
+      throw Exception('Failed to fetch leaderboard: ${response.body}');
+    }
+  }
+
 }

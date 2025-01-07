@@ -7,7 +7,6 @@ import 'package:nyampah_app/screens/home/profile_screen.dart';
 import 'package:nyampah_app/screens/home/scan_image_screen.dart';
 import 'package:nyampah_app/screens/home/trash_tracker_screen.dart';
 import 'package:nyampah_app/screens/home/voucher_screen.dart';
-import 'package:nyampah_app/screens/login/login_screen.dart';
 import 'package:nyampah_app/screens/onboarding/onboarding_screen.dart';
 import 'package:nyampah_app/theme/navbar.dart';
 

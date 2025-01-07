@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:nyampah_app/theme/colors.dart';
+import 'package:nyampah_app/services/api_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -14,6 +15,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   Map<String, dynamic>? user;
   String? token;
+  Future<List<Map<String, dynamic>>>? leaderboardFuture;
 
   @override
   void initState() {
@@ -30,8 +32,15 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         user = jsonDecode(userData);
         token = userToken;
+        leaderboardFuture = ApiService.getLeaderboard(token!);
       });
     }
+  }
+
+  Future<void> refreshLeaderboard() async {
+    setState(() {
+      leaderboardFuture = ApiService.getLeaderboard(token!);
+    });
   }
 
   @override
@@ -190,7 +199,218 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ),
                           SizedBox(height: basePadding),
-                          // Add other containers or widgets here
+                          Container(
+                            width: size.width,
+                            height: size.height * 0.4,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: LayoutBuilder(
+                              builder: (context, constraints) {
+                                return Column(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 16, vertical: 12),
+                                      decoration: const BoxDecoration(
+                                        color: leaderBoardTitleColor,
+                                        borderRadius: BorderRadius.only(
+                                          topLeft: Radius.circular(8),
+                                          topRight: Radius.circular(8),
+                                        ),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Container(
+                                            padding: const EdgeInsets.all(8),
+                                            decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius: BorderRadius.circular(8),
+                                            ),
+                                            child: ClipRRect(
+                                              child: SvgPicture.asset(
+                                                'assets/images/leaderboard.svg',
+                                                width: constraints.maxWidth * 0.06,
+                                                height: constraints.maxWidth * 0.06,
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(
+                                              width: constraints.maxWidth * 0.04),
+                                          const Text(
+                                            'Leaderboard',
+                                            style: TextStyle(
+                                                fontFamily: 'Inter',
+                                                fontSize: 24,
+                                                color: greenColor,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          IconButton(
+                                            icon: const Icon(Icons.refresh, color: greenColor),
+                                            onPressed: refreshLeaderboard,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: constraints.maxWidth,
+                                      height: constraints.maxHeight * 0.63,
+                                      child: FutureBuilder<List<Map<String, dynamic>>>(
+                                        future: leaderboardFuture,
+                                        builder: (context, snapshot) {
+                                          if (snapshot.connectionState == ConnectionState.waiting) {
+                                            return const Center(child: CircularProgressIndicator());
+                                          } else if (snapshot.hasError) {
+                                            return Center(child: Text('Error: ${snapshot.error}'));
+                                          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                                            return const Center(child: Text('No data available'));
+                                          } else {
+                                            // Sort the leaderboard data by "exp" in descending order and take the top 5
+                                            final leaderboardData = (snapshot.data!)
+                                                .toList()
+                                                ..sort((a, b) => (b['exp'] as int).compareTo(a['exp'] as int));
+                                            final top5 = leaderboardData.take(3).toList();
+
+                                            return Column(
+                                              children: [
+                                                ListView.builder(
+                                                  shrinkWrap: true,
+                                                  itemCount: top5.length,
+                                                  itemBuilder: (context, index) {
+                                                    final user = top5[index];
+                                                    return Padding(
+                                                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                                                      child: Row(
+                                                        mainAxisAlignment: MainAxisAlignment.center,
+                                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                                        children: [
+                                                          Text(
+                                                            '${index + 1}',
+                                                            style: TextStyle(
+                                                              color: greenColor,
+                                                              fontFamily: 'Inter',
+                                                              fontWeight: FontWeight.bold,
+                                                              fontSize: 20, // Adjust to match your titleSize
+                                                            ),
+                                                          ),
+                                                          const SizedBox(width: 20),
+                                                          ClipOval(
+                                                            child: Image.network(
+                                                              user['profileImage'] ?? 'assets/images/placeholder_image.png',
+                                                              width: 40,
+                                                              fit: BoxFit.cover,
+                                                            ),
+                                                          ),
+                                                          const SizedBox(width: 20),
+                                                          Column(
+                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                            children: [
+                                                              Text(
+                                                                user['name'] ?? 'Unknown User',
+                                                                style: TextStyle(
+                                                                  fontFamily: 'Inter',
+                                                                  fontWeight: FontWeight.bold,
+                                                                  color: greenColor,
+                                                                  fontSize: 16,
+                                                                ),
+                                                              ),
+                                                              Text(
+                                                                'EXP: ${user['exp']}',
+                                                                style: TextStyle(
+                                                                  fontFamily: 'Inter',
+                                                                  fontWeight: FontWeight.bold,
+                                                                  color: greenWithOpacity,
+                                                                  fontSize: 14,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          const Spacer(),
+                                                          Text(
+                                                            '${user['points']} points',
+                                                            style: TextStyle(
+                                                              fontFamily: 'Inter',
+                                                              fontWeight: FontWeight.bold,
+                                                              color: greenColor,
+                                                              fontSize: 16,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                                Divider(),
+                                                Row(
+                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                                    children: [
+                                                      Text(
+                                                        '${user?['rank'] ?? 'N/A'}',
+                                                        style: TextStyle(
+                                                          color: greenColor,
+                                                          fontFamily: 'Inter',
+                                                          fontWeight: FontWeight.bold,
+                                                          fontSize: 20, // Adjust to match your titleSize
+                                                        ),
+                                                      ),
+                                                      const SizedBox(width: 20),
+                                                      ClipOval(
+                                                        child: Image.asset(
+                                                          'assets/images/${user?['profile_image'] ?? 'placeholder_image.png'}',
+                                                          width: 40,
+                                                          height: 40,
+                                                          fit: BoxFit.cover,
+                                                        ),
+                                                      ),
+                                                      const SizedBox(width: 20),
+                                                      Column(
+                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                        children: [
+                                                          Text(
+                                                            user?['name'] ?? 'Unknown User',
+                                                            style: TextStyle(
+                                                              fontFamily: 'Inter',
+                                                              fontWeight: FontWeight.bold,
+                                                              color: greenColor,
+                                                              fontSize: 16,
+                                                            ),
+                                                          ),
+                                                          Text(
+                                                            'EXP: ${user?['exp'] ?? 0}',
+                                                            style: TextStyle(
+                                                              fontFamily: 'Inter',
+                                                              fontWeight: FontWeight.bold,
+                                                              color: greenWithOpacity,
+                                                              fontSize: 14,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      const Spacer(),
+                                                      Text(
+                                                        '${user?['points'] ?? 0} points',
+                                                        style: TextStyle(
+                                                          fontFamily: 'Inter',
+                                                          fontWeight: FontWeight.bold,
+                                                          color: greenColor,
+                                                          fontSize: 16,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                              ],
+                                            );
+                                          }
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
+                            ),
+                          )
                         ],
                       ),
                     ),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:nyampah_app/screens/home/home_screen.dart';
+import 'package:nyampah_app/main.dart';
 import 'package:nyampah_app/screens/login/login_screen.dart';
 import 'package:nyampah_app/services/api_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -149,7 +149,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => const HomeScreen()),
+                                    builder: (context) => const MainNavigator()),
                               );
                             } catch (error) {
                               ScaffoldMessenger.of(context).showSnackBar(

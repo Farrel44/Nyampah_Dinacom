@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:nyampah_app/screens/home/edit_screen.dart';
 import 'package:nyampah_app/theme/colors.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
+
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -11,6 +14,28 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  Map<String, dynamic>? user;
+  String? token;
+
+  @override
+  void initState() {
+    super.initState();
+    loadUserData();
+  }
+
+  Future<void> loadUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userData = prefs.getString('user');
+    final userToken = prefs.getString('token');
+
+    if (userData != null) {
+      setState(() {
+        user = jsonDecode(userData);
+        token = userToken;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -50,22 +75,30 @@ class _ProfilePageState extends State<ProfilePage> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                "{username}",
-                                style: TextStyle(
-                                    color: greenColor,
-                                    fontFamily: 'Inter',
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: constraints.maxWidth * 0.06),
+                              SizedBox(
+                                width: constraints.maxWidth * 0.5,
+                                child: Text(
+                                  "${user?['name'] ?? 'Nama Pengguna'}",
+                                  style: TextStyle(
+                                      color: greenColor,
+                                      fontFamily: 'Inter',
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: constraints.maxWidth * 0.06),
+                                ),
                               ),
-                              Text(
-                                "{email}",
-                                style: TextStyle(
+                                SizedBox(
+                                width: constraints.maxWidth * 0.5, 
+                                child: Text(
+                                  "${user?['email'] ?? 'Email Pengguna'}",
+                                  style: TextStyle(
                                     color: greenWithOpacity,
                                     fontFamily: 'Inter',
                                     fontWeight: FontWeight.bold,
                                     fontSize: constraints.maxWidth * 0.05),
-                              ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                ),
+                              
                               Row(
                                 children: [
                                   GestureDetector(
@@ -155,7 +188,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             ],
                           ),
                           Divider(
-                            height: constraints.maxWidth * 0.08,
+                            height: constraints.maxWidth * 0.05,
                             color: greenWithOpacity,
                           ),
                           Row(
@@ -252,7 +285,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             ],
                           ),
                           Divider(
-                            height: constraints.maxWidth * 0.08,
+                            height: constraints.maxWidth * 0.05,
                             color: greenWithOpacity,
                           ),
                           Row(
