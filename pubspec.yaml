@@ -10,11 +10,14 @@ environment:
   sdk: ^3.5.3
 
 dependencies:
+  cupertino_icons: ^1.0.8
   flutter:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
   flutter_svg: ^2.0.16
+  image_picker: ^0.8.7+5
+  
   http: ^1.2.2
   shared_preferences: 2.0.15
 
