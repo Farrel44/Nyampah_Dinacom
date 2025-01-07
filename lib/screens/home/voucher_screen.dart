@@ -43,6 +43,7 @@ class VoucherPageState extends State<VoucherPage> {
       extendBody: true, // Agar body diperpanjang ke area navbar
       backgroundColor: backgroundColor,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         scrolledUnderElevation: 0,
         backgroundColor: backgroundColor,
         centerTitle: false,
