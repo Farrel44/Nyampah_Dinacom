@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:nyampah_app/screens/signup/signup_screen.dart';
+import 'package:nyampah_app/screens/home/home_screen.dart';
+import 'package:nyampah_app/services/api_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 
 
 class LoginScreen extends StatefulWidget {
@@ -90,8 +94,40 @@ Widget build(BuildContext context) {
                       ),
                       SizedBox(height: 20 * scale),
                       ElevatedButton(
-                        onPressed: () {
-                          print('Sign Up pressed');
+                        onPressed: () async {
+                          final email = emailController.text.trim();
+                          final password = passwordController.text;
+
+                          if (email.isEmpty || password.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Please fill in all fields')),
+                            );
+                            return;
+                          }
+
+                          try {
+                            final response = await ApiService.loginUser(email, password);
+
+                            final prefs = await SharedPreferences.getInstance();
+                            final user = response['data']['user'];
+                            final token = response['data']['token'];
+
+                            await prefs.setString('user', jsonEncode(user));
+                            await prefs.setString('token', token);
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Login successful!')),
+                            );
+
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const HomePage()),
+                            );
+                          } catch (error) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Login failed: $error')),
+                            );
+                          }
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF00693E),
