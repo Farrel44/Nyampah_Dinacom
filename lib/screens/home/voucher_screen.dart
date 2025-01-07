@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nyampah_app/theme/colors.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 
 class VoucherPage extends StatefulWidget {
   const VoucherPage({super.key});
@@ -9,6 +11,28 @@ class VoucherPage extends StatefulWidget {
 }
 
 class VoucherPageState extends State<VoucherPage> {
+  Map<String, dynamic>? user;
+  String? token;
+
+  @override
+  void initState() {
+    super.initState();
+    loadUserData();
+  }
+
+  Future<void> loadUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userData = prefs.getString('user');
+    final userToken = prefs.getString('token');
+
+    if (userData != null) {
+      setState(() {
+        user = jsonDecode(userData);
+        token = userToken;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
