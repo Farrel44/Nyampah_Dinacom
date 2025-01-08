@@ -169,4 +169,40 @@ class ApiService {
     }
   }
 
+  static Future<Map<String, dynamic>> getVoucherDetail(String token, int id) async {
+    final url = Uri.parse('$baseUrl/voucher/$id');
+
+    final response = await http.get(
+      url,
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body)['data'];
+    } else {
+      throw Exception('Failed to fetch voucher detail: ${response.body}');
+    }
+  }
+
+  static Future<Map<String, dynamic>> redeemVoucher(String token, int voucherId) async {
+    final url = Uri.parse('$baseUrl/voucher-redeem/$voucherId');
+
+    final response = await http.post(
+      url,
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Failed to redeem voucher: ${response.body}');
+    }
+  }
+
 }

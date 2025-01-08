@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 import 'package:nyampah_app/theme/colors.dart';
 
 class EditProfile extends StatefulWidget {
@@ -15,6 +16,8 @@ class _EditProfileState extends State<EditProfile> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  Map<String, dynamic>? user;
+  String? token;
 
   File? image;
 
@@ -27,7 +30,26 @@ class _EditProfileState extends State<EditProfile> {
         image = File(pickedImage.path);
       });
     } catch (e) {
-      print("Error picking image: $e");
+      debugPrint("Error picking image: $e");
+    }
+  }
+  
+  @override
+  void initState() {
+    super.initState();
+    loadUserData();
+  }
+
+  Future<void> loadUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userData = prefs.getString('user');
+    final userToken = prefs.getString('token');
+
+    if (userData != null) {
+      setState(() {
+        user = jsonDecode(userData);
+        token = userToken;
+      });
     }
   }
 
@@ -193,7 +215,7 @@ class _EditProfileState extends State<EditProfile> {
       {bool isObscure = false}) {
     return Container(
       constraints: BoxConstraints(
-        minHeight: 50,
+        minHeight: 0,
         maxHeight: MediaQuery.of(context).size.height * 0.07,
       ),
       child: TextFormField(

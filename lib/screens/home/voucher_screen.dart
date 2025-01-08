@@ -43,17 +43,21 @@ class VoucherPageState extends State<VoucherPage> {
 
     try {
       final fetchedVouchers = await ApiService.getAllVouchers(token);
-      setState(() {
-        vouchers = fetchedVouchers;
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          vouchers = fetchedVouchers;
+          isLoading = false;
+        });
+      }
     } catch (e) {
-      setState(() {
-        isLoading = false;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to fetch vouchers: $e')),
-      );
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to fetch vouchers: $e')),
+        );
+      }
     }
   }
 
@@ -179,10 +183,128 @@ class VoucherPageState extends State<VoucherPage> {
                                             fontSize: 14,
                                           ),
                                         ),
-                                        const Icon(
+                                        GestureDetector(
+                                        onTap: () {
+                                          showDialog(
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              return AlertDialog(
+                                                titlePadding: const EdgeInsets.all(16),
+                                                title: Row(
+                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                  children: [
+                                                    const Text(
+                                                      'Klaim Voucher',
+                                                      style: TextStyle(
+                                                        fontFamily: 'Inter',
+                                                        fontWeight: FontWeight.bold,
+                                                        fontSize: 18,
+                                                      ),
+                                                    ),
+                                                    GestureDetector(
+                                                      onTap: () {
+                                                        Navigator.of(context).pop(); // Close the dialog
+                                                      },
+                                                      child: const Icon(
+                                                        Icons.close,
+                                                        color: Colors.grey,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                content: Column(
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    const Text(
+                                                      "Nama",
+                                                      style: TextStyle(
+                                                        fontFamily: 'Inter',
+                                                        fontSize: 20,
+                                                        fontWeight: FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      "${voucher['rewardName']}",
+                                                      style: const TextStyle(
+                                                        fontFamily: 'Inter',
+                                                        fontSize: 16,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                actions: [
+                                                  TextButton(
+                                                    onPressed: () async {
+                                                      // Fetch the token from the user's state or storage
+                                                      if (token != null) {
+                                                        try {
+                                                            final voucherId = vouchers.firstWhere((v) => v['rewardName'] == voucher['rewardName'])['id'];
+                                                            final response = await ApiService.redeemVoucher(token!, voucherId);
+                                                          final voucherCode = response['data']['voucher'];
+
+                                                          // Show a success dialog with the voucher code
+                                                          showDialog(
+                                                            context: context,
+                                                            builder: (BuildContext context) {
+                                                              return AlertDialog(
+                                                                title: const Text('Voucher Redeemed'),
+                                                                content: Text('Your voucher code: $voucherCode'),
+                                                                actions: [
+                                                                  TextButton(
+                                                                    onPressed: () {
+                                                                      Navigator.of(context).pop(); // Close the dialog
+                                                                    },
+                                                                    child: const Text('OK'),
+                                                                  ),
+                                                                ],
+                                                              );
+                                                            },
+                                                          );
+                                                        } catch (e) {
+                                                          // Handle error
+                                                          showDialog(
+                                                            context: context,
+                                                            builder: (BuildContext context) {
+                                                              return AlertDialog(
+                                                                title: const Text('Error'),
+                                                                content: Text('Failed to redeem voucher: $e'),
+                                                                actions: [
+                                                                  TextButton(
+                                                                    onPressed: () {
+                                                                      Navigator.of(context).pop(); // Close the error dialog
+                                                                    },
+                                                                    child: const Text('OK'),
+                                                                  ),
+                                                                ],
+                                                              );
+                                                            },
+                                                          );
+                                                        }
+                                                      } else {
+                                                        // Handle missing token (optional)
+                                                        Navigator.of(context).pop();
+                                                      }
+                                                    },
+                                                    child: const Text(
+                                                      'Klaim',
+                                                      style: TextStyle(
+                                                        color: greenColor,
+                                                        fontFamily: 'Inter',
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              );
+                                            },
+                                          );
+                                        },
+                                        child: const Icon(
                                           Icons.chevron_right,
                                           color: greenColor,
-                                        )
+                                        ),
+                                      ),
+
                                       ],
                                     ),
                                   ),
