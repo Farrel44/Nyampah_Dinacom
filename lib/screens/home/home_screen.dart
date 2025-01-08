@@ -141,7 +141,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
-                                    children: [
+                                    children:[
                                       Text(
                                         '${user?['rank'] ?? 'Rank'}',
                                         style: TextStyle(
@@ -342,7 +342,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   },
                                                 ),
                                                 Divider(),
-                                                Row(
+                                                SingleChildScrollView(
+                                                  scrollDirection: Axis.horizontal,
+                                                  child: Row(
+                                                    mainAxisSize: MainAxisSize.min,
                                                     mainAxisAlignment: MainAxisAlignment.center,
                                                     crossAxisAlignment: CrossAxisAlignment.center,
                                                     children: [
@@ -375,7 +378,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                               fontWeight: FontWeight.bold,
                                                               color: greenColor,
                                                               fontSize: 16,
-                                                            ),
+                                                            )
                                                           ),
                                                           Text(
                                                             'EXP: ${user?['exp'] ?? 0}',
@@ -388,18 +391,22 @@ class _HomeScreenState extends State<HomeScreen> {
                                                           ),
                                                         ],
                                                       ),
-                                                      const Spacer(),
-                                                      Text(
-                                                        '${user?['points'] ?? 0} points',
-                                                        style: TextStyle(
-                                                          fontFamily: 'Inter',
-                                                          fontWeight: FontWeight.bold,
-                                                          color: greenColor,
-                                                          fontSize: 16,
+                                                      const SizedBox(width: 20),
+                                                      Flexible(
+                                                        fit: FlexFit.loose,
+                                                        child: Text(
+                                                          '${user?['points'] ?? 0} points',
+                                                          style: TextStyle(
+                                                            fontFamily: 'Inter',
+                                                            fontWeight: FontWeight.bold,
+                                                            color: greenColor,
+                                                            fontSize: 16,
+                                                          ),
                                                         ),
                                                       ),
                                                     ],
                                                   ),
+                                                ),
                                               ],
                                             );
                                           }
