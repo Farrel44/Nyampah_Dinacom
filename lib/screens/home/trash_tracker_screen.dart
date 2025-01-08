@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:nyampah_app/theme/colors.dart';
 import 'package:nyampah_app/theme/navbar.dart';
+import 'package:nyampah_app/services/api_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 
 class TrashHistory extends StatefulWidget {
   const TrashHistory({super.key});
@@ -10,6 +13,28 @@ class TrashHistory extends StatefulWidget {
 }
 
 class _TrashHistoryState extends State<TrashHistory> {
+  Map<String, dynamic>? user;
+  String? token;
+
+  @override
+  void initState() {
+    super.initState();
+    loadUserData();
+  }
+
+  Future<void> loadUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userData = prefs.getString('user');
+    final userToken = prefs.getString('token');
+
+    if (userData != null) {
+      setState(() {
+        user = jsonDecode(userData);
+        token = userToken;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -69,108 +94,131 @@ class _TrashHistoryState extends State<TrashHistory> {
                 ),
                 SizedBox(height: basePadding),
                 Expanded(
-                  child: GridView.builder(
-                    physics: const BouncingScrollPhysics(),
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: basePadding,
-                      mainAxisSpacing: basePadding,
-                      childAspectRatio: 0.62,
-                    ),
-                    itemCount: 6,
-                    itemBuilder: (context, index) {
-                      return LayoutBuilder(
-                        builder: (context, constraints) {
-                          return Container(
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(basePadding),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.2),
-                                  blurRadius: 4,
-                                  offset: const Offset(0, 2),
-                                )
-                              ],
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  width: constraints.maxWidth,
-                                  height: constraints.maxHeight * 0.65,
-                                  clipBehavior: Clip.antiAlias,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.only(
-                                      topLeft: Radius.circular(basePadding),
-                                      topRight: Radius.circular(basePadding),
-                                    ),
-                                  ),
-                                  child: Image.asset(
-                                    'assets/images/sampah.jpeg',
-                                    fit: BoxFit.cover,
-                                  ),
+                  child: FutureBuilder<List<Map<String, dynamic>>>(
+                    future: token != null ? ApiService.getTrashByGroupData(token!, 'week') : Future.value([]), // Replace 'week' with desired period
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        return Center(child: Text('Error: ${snapshot.error}'));
+                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return const Center(child: Text('No data available.'));
+                      }
+
+                      final trashData = snapshot.data!;
+                      return GridView.builder(
+                        physics: const BouncingScrollPhysics(),
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: basePadding,
+                          mainAxisSpacing: basePadding,
+                          childAspectRatio: 0.62,
+                        ),
+                        itemCount: trashData.length,
+                        itemBuilder: (context, index) {
+                          final trash = trashData[index];
+                          return LayoutBuilder(
+                            builder: (context, constraints) {
+                              return Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(basePadding),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey.withOpacity(0.2),
+                                      blurRadius: 4,
+                                      offset: const Offset(0, 2),
+                                    )
+                                  ],
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.all(12),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      width: constraints.maxWidth,
+                                      height: constraints.maxHeight * 0.65,
+                                      clipBehavior: Clip.antiAlias,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.only(
+                                          topLeft: Radius.circular(basePadding),
+                                          topRight: Radius.circular(basePadding),
+                                        ),
+                                      ),
+                                      child: Image.network(
+                                        trash['trash_image'] ?? '', // Use API image URL
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (context, error, stackTrace) => Image.asset(
+                                          'assets/images/sampah.jpeg', // Fallback image
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.all(12),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          Expanded(
-                                            child: Text(
-                                              'Sampah Plastik',
-                                              style: TextStyle(
-                                                fontSize: size.width * 0.035,
-                                                fontFamily: 'Inter',
-                                                color: greenColor,
-                                                fontWeight: FontWeight.bold,
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Expanded(
+                                                child: Text(
+                                                  trash['trash_name'] ?? 'Unknown',
+                                                  style: TextStyle(
+                                                    fontSize: size.width * 0.035,
+                                                    fontFamily: 'Inter',
+                                                    color: greenColor,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
                                               ),
+                                              const Icon(
+                                                Icons.warning_amber_rounded,
+                                                color: Colors.orange,
+                                                size: 22,
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            trash['trash_category_name'] ?? 'Unknown',
+                                            style: TextStyle(
+                                              color: greenWithOpacity,
+                                              fontSize: size.width * 0.035,
+                                              fontFamily: 'Inter',
+                                              fontWeight: FontWeight.bold,
                                             ),
                                           ),
-                                          const Icon(
-                                            Icons.warning_amber_rounded,
-                                            color: Colors.orange,
-                                            size: 22,
+                                          const SizedBox(height: 8),
+                                          Text(
+                                            trash['created_at'] != null
+                                                ? DateTime.parse(trash['created_at'])
+                                                    .toLocal()
+                                                    .toString()
+                                                    .split(' ')[0]
+                                                : 'Unknown Date',
+                                            style: TextStyle(
+                                              color: greenColor,
+                                              fontFamily: 'Inter',
+                                              fontSize: size.width * 0.032,
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           ),
                                         ],
                                       ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        'Anorganik',
-                                        style: TextStyle(
-                                          color: greenWithOpacity,
-                                          fontSize: size.width * 0.035,
-                                          fontFamily: 'Inter',
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 8),
-                                      Text(
-                                        '12.33 | 10 Sept 2024',
-                                        style: TextStyle(
-                                          color: greenColor,
-                                          fontFamily: 'Inter',
-                                          fontSize: size.width * 0.032,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
+                              );
+                            },
                           );
                         },
                       );
                     },
                   ),
                 ),
+
               ],
             ),
           ),

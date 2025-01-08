@@ -103,7 +103,9 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                               ClipOval(
                                 child: Image.asset(
-                                  'assets/images/${user?['profile_image'] ?? 'placeholder_image.png'}',
+                                  user?['profile_image'] != null && user!['profile_image'].isNotEmpty
+                                      ? 'assets/images/${user!['profile_image']}'
+                                      : 'assets/images/valid_placeholder_image.png',
                                   width: profileImageSize,
                                   height: profileImageSize,
                                   fit: BoxFit.cover,
@@ -268,7 +270,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           } else {
                                             // Sort the leaderboard data by "exp" in descending order and take the top 5
                                             final leaderboardData = (snapshot.data!)
-                                                .toList()
+                                                .toList() 
                                                 ..sort((a, b) => (b['exp'] as int).compareTo(a['exp'] as int));
                                             final top5 = leaderboardData.take(3).toList();
 
@@ -297,7 +299,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                           const SizedBox(width: 20),
                                                           ClipOval(
                                                             child: Image.network(
-                                                              user['profileImage'] ?? 'assets/images/placeholder_image.png',
+                                                              user['profileImage'],
                                                               width: 40,
                                                               fit: BoxFit.cover,
                                                             ),
@@ -360,8 +362,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       ),
                                                       const SizedBox(width: 20),
                                                       ClipOval(
-                                                        child: Image.asset(
-                                                          'assets/images/${user?['profile_image'] ?? 'placeholder_image.png'}',
+                                                        child: Image.network(
+                                                          user?['profile_image'] ?? '',
                                                           width: 40,
                                                           height: 40,
                                                           fit: BoxFit.cover,

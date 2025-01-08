@@ -140,62 +140,65 @@ class OnboardingScreen extends StatelessWidget {
   }
 
   Widget _buildTextSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        RichText(
-          text: const TextSpan(
-            children: [
-              TextSpan(
-                text: "Don’t wait for",
-                style: TextStyle(
-                  fontFamily: 'Inter',
-                  color: Color(0xFF00693E),
-                  fontSize: 23,
-                  fontWeight: FontWeight.w800,
+    return Padding(
+      padding: const EdgeInsets.only(top: 25),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          RichText(
+            text: const TextSpan(
+              children: [
+                TextSpan(
+                  text: "Don’t wait for",
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    color: Color(0xFF00693E),
+                    fontSize: 23,
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
-              ),
-              TextSpan(
-                text: " change",
-                style: TextStyle(
-                  fontFamily: 'Inter',
-                  color: Color(0xFFFF8302),
-                  fontSize: 23,
-                  fontWeight: FontWeight.w800,
+                TextSpan(
+                  text: " change",
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    color: Color(0xFFFF8302),
+                    fontSize: 23,
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-        RichText(
-          text: const TextSpan(
-            children: [
-              TextSpan(
-                text: "Be the",
-                style: TextStyle(
-                  fontFamily: 'JosefinSans',
-                  color: Color(0xFFFF8302),
-                  fontSize: 40,
-                  fontVariations: [
-                    FontVariation('wght', 700),
-                  ],
+          RichText(
+            text: const TextSpan(
+              children: [
+                TextSpan(
+                  text: "Be the",
+                  style: TextStyle(
+                    fontFamily: 'JosefinSans',
+                    color: Color(0xFFFF8302),
+                    fontSize: 40,
+                    fontVariations: [
+                      FontVariation('wght', 700),
+                    ],
+                  ),
                 ),
-              ),
-              TextSpan(
-                text: " change",
-                style: TextStyle(
-                  fontFamily: 'JosefinSans',
-                  color: Color(0xFF00693E),
-                  fontSize: 40,
-                  fontVariations: [
-                    FontVariation('wght', 700),
-                  ],
+                TextSpan(
+                  text: " change",
+                  style: TextStyle(
+                    fontFamily: 'JosefinSans',
+                    color: Color(0xFF00693E),
+                    fontSize: 40,
+                    fontVariations: [
+                      FontVariation('wght', 700),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 

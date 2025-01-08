@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
 
 class ApiService {
@@ -85,6 +86,86 @@ class ApiService {
       }).toList();
     } else {
       throw Exception('Failed to fetch leaderboard: ${response.body}');
+    }
+  }
+
+  static Future<List<Map<String, dynamic>>> getAllVouchers(String token) async {
+    final url = Uri.parse('$baseUrl/get-all-vouchers');
+
+    final response = await http.get(
+      url,
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> responseData = jsonDecode(response.body);
+
+      final List<dynamic> rewardsData = responseData['data'];
+
+      return rewardsData.map<Map<String, dynamic>>((reward) {
+        return {
+          'rewardName': reward['reward_name'],
+          'rewardImage': reward['reward_image'],
+          'description': reward['description'],
+          'pointsRequired': reward['points_required'],
+          'stock': reward['stock'],
+        };
+      }).toList();
+    } else {
+      throw Exception('Failed to fetch vouchers: ${response.body}');
+    }
+  }
+
+  static Future<List<Map<String, dynamic>>> getTrashByGroupData(
+      String token, String period) async {
+    final url = Uri.parse('$baseUrl/get-trash/$period');
+    final response = await http.get(
+      url,
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> responseData = jsonDecode(response.body);
+      if (responseData['data'] != null) {
+        return List<Map<String, dynamic>>.from(responseData['data']);
+      } else {
+        throw Exception('No data found in the response.');
+      }
+    } else {
+      throw Exception('Failed to fetch data: ${response.statusCode}');
+    }
+  }
+
+  static Future<Map<String, dynamic>> scanImage(String token, File imageFile) async {
+    final url = Uri.parse('$baseUrl/scan-image');
+
+    final request = http.MultipartRequest('POST', url)
+      ..headers['Accept'] = 'application/json'
+      ..headers['Authorization'] = 'Bearer $token'
+      ..files.add(await http.MultipartFile.fromPath('trash_image', imageFile.path));
+
+    final response = await request.send();
+
+    if (response.statusCode == 201) {
+      final responseData = await response.stream.bytesToString();
+      final Map<String, dynamic> json = jsonDecode(responseData);
+
+      return {
+        'trash_image': json['data']['trash_image'],
+        'trash_name': json['data']['trash_name'],
+        'description': json['data']['description'],
+        'category': json['data']['category'],
+        'pengelolaan': json['data']['pengelolaan'],
+        'trash_quantity': json['data']['trash_quantity'],
+      };
+    } else {
+      final errorResponse = await response.stream.bytesToString();
+      throw Exception('Failed to scan image: $errorResponse');
     }
   }
 

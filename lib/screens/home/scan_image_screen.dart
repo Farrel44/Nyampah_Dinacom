@@ -1,6 +1,10 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:nyampah_app/theme/colors.dart';
+import 'package:nyampah_app/services/api_service.dart';
+import 'dart:io';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 
 class ScanImage extends StatefulWidget {
   const ScanImage({super.key});
@@ -13,18 +17,22 @@ class _ScanImageState extends State<ScanImage> with TickerProviderStateMixin {
   late Future<List<CameraDescription>> _availableCameras;
   CameraController? _cameraController;
   late final TabController _tabController;
+  Map<String, dynamic>? user;
+  String? token;
+  bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     _availableCameras = availableCameras();
+    loadUserData();
   }
 
   Future<void> _initializeCamera(CameraDescription camera) async {
     _cameraController = CameraController(
       camera,
-      ResolutionPreset.medium,
+      ResolutionPreset.ultraHigh,
     );
     await _cameraController!.initialize();
     setState(() {});
@@ -35,6 +43,19 @@ class _ScanImageState extends State<ScanImage> with TickerProviderStateMixin {
     _cameraController?.dispose();
     _tabController.dispose();
     super.dispose();
+  }
+
+  Future<void> loadUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userData = prefs.getString('user');
+    final userToken = prefs.getString('token');
+
+    if (userData != null) {
+      setState(() {
+        user = jsonDecode(userData);
+        token = userToken;
+      });
+    }
   }
 
   @override
@@ -86,172 +107,190 @@ class _ScanImageState extends State<ScanImage> with TickerProviderStateMixin {
                 left: MediaQuery.of(context).size.width * 0.5 - 30,
                 child: FloatingActionButton(
                   onPressed: () async {
-                    showModalBottomSheet(
-                      context: context,
-                      isScrollControlled: true, // Biarkan modal bisa naik penuh
-                      shape: RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.vertical(top: Radius.circular(20)),
-                      ),
-                      builder: (context) {
-                        return DraggableScrollableSheet(
-                          initialChildSize:
-                              0.3, // Saat pertama muncul, 30% dari layar
-                          minChildSize: 0.1, // Bisa diperkecil hingga 10% layar
-                          maxChildSize: 0.9, // Bisa diperbesar hingga 90% layar
-                          expand: false,
-                          builder: (context, scrollController) {
-                            return Container(
-                              padding: EdgeInsets.all(basePadding),
-                              decoration: BoxDecoration(
-                                color: backgroundColor,
-                                borderRadius: BorderRadius.vertical(
-                                    top: Radius.circular(20)),
-                              ),
-                              child: Column(
-                                children: [
-                                  Container(
-                                    width: 40,
-                                    height: 5,
-                                    margin: EdgeInsets.only(bottom: 10),
-                                    decoration: BoxDecoration(
-                                      color: greenColor,
-                                      borderRadius: BorderRadius.circular(10),
+                    try {
+                      setState(() {
+                        isLoading = true;
+                      });
+
+                      final image = await _cameraController!.takePicture();
+
+                      final response = await ApiService.scanImage(token!, File(image.path));
+
+                      var category = response['category'];
+                      if (category == 'Undefined') {
+                        category = 'Tidak terdeteksi ';
+                      }
+                      final trashName = response['trash_name'];
+                      final description = response['description'];
+                      final pengelolaan = response['pengelolaan'];
+
+                      setState(() {
+                        isLoading = false;
+                      });
+
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+                        ),
+                        builder: (context) {
+                          return DraggableScrollableSheet(
+                            initialChildSize: 0.3,
+                            minChildSize: 0.1,
+                            maxChildSize: 0.9,
+                            expand: false,
+                            builder: (context, scrollController) {
+                              return Container(
+                                padding: EdgeInsets.all(basePadding),
+                                decoration: BoxDecoration(
+                                  color: backgroundColor,
+                                  borderRadius: BorderRadius.vertical(top: Radius.circular(50)),
+                                ),
+                                child: Column(
+                                  children: [
+                                    Container(
+                                      width: 40,
+                                      height: 5,
+                                      margin: EdgeInsets.only(bottom: 10),
+                                      decoration: BoxDecoration(
+                                        color: greenColor,
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
                                     ),
-                                  ),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            "Anorganik",
-                                            style: TextStyle(
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              category,
+                                              style: TextStyle(
                                                 fontSize: basePadding,
                                                 fontFamily: 'Inter',
                                                 color: greenWithOpacity,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                          Text(
-                                            "Botol Plastik",
-                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            Text(
+                                              trashName,
+                                              style: TextStyle(
                                                 fontSize: basePadding * 1.3,
                                                 fontFamily: 'Inter',
                                                 color: greenColor,
-                                                fontWeight: FontWeight.bold),
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(
+                                          width: 50,
+                                          height: 50,
+                                          child: ElevatedButton(
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: leaderBoardTitleColor,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(10),
+                                              ),
+                                              alignment: Alignment.center,
+                                            ),
+                                            onPressed: () {},
+                                            child: Icon(
+                                              Icons.warning_amber_rounded,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    DefaultTabController(
+                                      length: 2,
+                                      child: Column(
+                                        children: [
+                                          TabBar(
+                                            controller: _tabController,
+                                            tabs: [
+                                              Tab(text: 'Deskripsi'),
+                                              Tab(text: 'Pengelolaan'),
+                                            ],
+                                            labelStyle: TextStyle(
+                                              fontFamily: 'Inter',
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                            dividerColor: Colors.transparent,
+                                            labelColor: greenColor,
+                                            unselectedLabelStyle: TextStyle(
+                                              color: greenColor,
+                                              decoration: TextDecoration.none,
+                                            ),
+                                            indicatorColor: greenColor,
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                    SizedBox(height: size.height * 0.03),
+                                    Expanded(
+                                      child: TabBarView(
+                                        controller: _tabController,
+                                        children: [
+                                          ListView(
+                                            controller: scrollController,
+                                            children: [
+                                              Text(
+                                                description,
+                                                textAlign: TextAlign.justify,
+                                                style: TextStyle(
+                                                  fontFamily: 'Inter',
+                                                  fontSize: basePadding * 0.9,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: greenColor,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          ListView(
+                                            controller: scrollController,
+                                            children: [
+                                              Text(
+                                                pengelolaan,
+                                                textAlign: TextAlign.justify,
+                                                style: TextStyle(
+                                                  fontFamily: 'Inter',
+                                                  fontSize: basePadding * 0.9,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: greenColor,
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ],
                                       ),
-                                      SizedBox(
-                                        width: 50,
-                                        height: 50,
-                                        child: ElevatedButton(
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor:
-                                                leaderBoardTitleColor,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                            ),
-                                            alignment: Alignment.center,
-                                          ),
-                                          onPressed: () {},
-                                          child: Icon(
-                                            Icons.warning_amber_rounded,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  DefaultTabController(
-                                    length: 2,
-                                    child: Column(
-                                      children: [
-                                        TabBar(
-                                          controller: _tabController,
-                                          tabs: [
-                                            Tab(text: 'Deskripsi'),
-                                            Tab(text: 'Pengelolaan'),
-                                          ],
-                                          labelStyle: TextStyle(
-                                            fontFamily: 'Inter',
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                          dividerColor: Colors.transparent,
-                                          labelColor: greenColor,
-                                          unselectedLabelStyle: TextStyle(
-                                            color: greenColor,
-                                            decoration: TextDecoration.none,
-                                          ),
-                                          indicatorColor: greenColor,
-                                        )
-                                      ],
                                     ),
-                                  ),
-                                  SizedBox(height: size.height * 0.03),
-                                  Expanded(
-                                    child: TabBarView(
-                                      controller: _tabController,
-                                      children: [
-                                        ListView(
-                                          controller: scrollController,
-                                          children: [
-                                            Text(
-                                              "Sampah plastik adalah limbah yang berasal dari berbagai produk berbahan dasar plastik, seperti botol, kantong, kemasan makanan, dan peralatan rumah tangga. Plastik merupakan bahan sintetis yang sulit terurai secara alami, sehingga menjadi salah satu penyebab utama pencemaran lingkungan, terutama di laut dan tanah.",
-                                              textAlign: TextAlign.justify,
-                                              style: TextStyle(
-                                                fontFamily: 'Inter',
-                                                fontSize: basePadding * 0.9,
-                                                fontWeight: FontWeight.bold,
-                                                color: greenColor,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        ListView(
-                                          controller: scrollController,
-                                          children: [
-                                            Text(
-                                              "cara pengelolaan",
-                                              textAlign: TextAlign.justify,
-                                              style: TextStyle(
-                                                fontFamily: 'Inter',
-                                                fontSize: basePadding * 0.9,
-                                                fontWeight: FontWeight.bold,
-                                                color: greenColor,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        );
-                      },
-                    );
-                    // try {
-                    //   final XFile? image =
-                    //       await _cameraController!.takePicture();
-                    //   if (image != null) {
-                    //     print("Gambar diambil: ${image.path}");
-                    //   }
-                    // } catch (e) {
-                    //   print("Error mengambil gambar: $e");
-                    // }
+                                  ],
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      );
+                    } catch (e) {
+                      print('Error: $e');
+                    } finally {
+                      setState(() {
+                        isLoading = false;
+                      });
+                    }
                   },
                   backgroundColor: Colors.green,
-                  child: const Icon(
-                    Icons.camera_alt,
-                    color: Colors.white,
-                  ),
+                  child: isLoading
+                      ? CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        )
+                      : const Icon(
+                          Icons.camera_alt,
+                          color: Colors.white,
+                        ),
                 ),
               ),
             ],

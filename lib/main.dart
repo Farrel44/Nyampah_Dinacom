@@ -1,7 +1,5 @@
 import 'package:camera/camera.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:nyampah_app/screens/home/edit_screen.dart';
 import 'package:nyampah_app/screens/home/home_screen.dart';
 import 'package:nyampah_app/screens/home/profile_screen.dart';
 import 'package:nyampah_app/screens/home/scan_image_screen.dart';
@@ -38,7 +36,7 @@ class MainNavigator extends StatefulWidget {
 }
 
 class _MainNavigatorState extends State<MainNavigator> {
-  int _currentIndex = 1;
+  int _currentIndex = 2;
 
   final List<Widget> _pages = [
     const VoucherPage(),
