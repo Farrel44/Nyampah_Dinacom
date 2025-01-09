@@ -113,7 +113,7 @@ class _TrashHistoryState extends State<TrashHistory> {
                     future: token != null ? ApiService.getTrashByGroupData(token!, selectedPeriod) : Future.value([]),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(child: CircularProgressIndicator());
+                        return const Center(child: CircularProgressIndicator(color:  Color(0xFF00693E),));
                       } else if (snapshot.hasError) {
                         return Center(child: Text('Error: ${snapshot.error}'));
                       } else if (!snapshot.hasData || snapshot.data!.isEmpty) {

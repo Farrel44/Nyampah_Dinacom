@@ -97,8 +97,8 @@ class _EditProfileState extends State<EditProfile> {
                               width: profileSize,
                               height: profileSize,
                             )
-                          : Image.asset(
-                              'assets/images/placeholder_image.png',
+                          : Image.network(
+                              'https://151f-180-245-135-167.ngrok-free.app/storage/${user?['profile_image']}',
                               fit: BoxFit.cover,
                               width: profileSize,
                               height: profileSize,

@@ -92,7 +92,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         SizedBox(height: 20 * scale),
                         _isLoading
-                            ? CircularProgressIndicator()
+                            ? CircularProgressIndicator(
+                              color: const Color(0xFF00693E),
+                            )
                             : ElevatedButton(
                                 onPressed: () async {
                                   setState(() {
@@ -227,6 +229,7 @@ class _LoginScreenState extends State<LoginScreen> {
         TextField(
           controller: controller,
           obscureText: isPassword && !passwordVisibility,
+          cursorColor: const Color(0xFF00693E), // Set cursor color to green
           decoration: InputDecoration(
             isDense: true,
             filled: true,

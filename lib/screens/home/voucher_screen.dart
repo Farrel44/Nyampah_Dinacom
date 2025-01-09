@@ -84,6 +84,7 @@ class VoucherPageState extends State<VoucherPage> {
                 color: greenColor,
                 borderRadius: BorderRadius.circular(basePadding * 1.4),
               ),
+              child: Text('${user?['points']}'),
             ),
           )
         ],
@@ -202,8 +203,27 @@ class VoucherPageState extends State<VoucherPage> {
                                               ),
                                             ),
                                             GestureDetector(
-                                              onTap: () {
-                                                // Redeem Logic here
+                                              onTap: () async {
+                                                try {
+                                                  final voucherDetail = await ApiService.getVoucherDetail(token!, vouchers[index]['id']);
+                                                    showDialog(
+                                                      context: context,
+                                                        builder: (BuildContext context) {
+                                                        return VoucherDetailDialog(
+                                                          token: token!,
+                                                          name: voucherDetail['reward_name'],
+                                                          cost: voucherDetail['points_required'],
+                                                          desc: voucherDetail['description'],
+                                                          voucherId: vouchers[index]['id'],
+                                                        );
+                                                      },
+                                                    );                                                
+                                                  } 
+                                                  catch (e) {
+                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                    SnackBar(content: Text('Failed to fetch voucher detail: $e')),
+                                                  );
+                                                }
                                               },
                                               child: const Icon(
                                                 Icons.chevron_right,
@@ -265,7 +285,7 @@ class RedeemDialog extends StatelessWidget {
                   onTap: () {
                     Navigator.of(context).pop();
                   },
-                  child: const Icon(Icons.close, color: Colors.black),
+                  child: const Icon(Icons.close_outlined, color: greenColor),
                 ),
               ),
               Center(
@@ -364,6 +384,193 @@ class RedeemDialog extends StatelessWidget {
               const Spacer(),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class VoucherDetailDialog extends StatelessWidget {
+  final String name;
+  final int cost;
+  final String desc;
+  final int voucherId;
+  final String token;
+
+  const VoucherDetailDialog({
+    Key? key,
+    required this.name,
+    required this.cost,
+    required this.desc,
+    required this.voucherId,
+    required this.token,
+  }) : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    return Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: SizedBox(
+        width: screenWidth * 0.95,
+        height: screenHeight * 0.4,
+        child: Column(
+          children: [
+            Expanded(
+              flex: 7,
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(16),
+                  ),
+                  color: Colors.white,
+                ),
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Tukar Voucher',
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: greenColor,
+                          ),
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.close, color: greenColor),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12), // Kurangi jarak
+                    // Voucher Name Section
+                    Text(
+                      'Nama Voucher',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: greenColor,
+                      ),
+                    ),
+                    const SizedBox(height: 6), // Kurangi jarak
+                    Text(
+                      name,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.bold,
+                        color: Color.fromARGB(255, 101, 101, 101),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    // Cost Section
+                    Text(
+                      'Cost',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: greenColor,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      '$cost Points',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.bold,
+                        color: Color.fromARGB(255, 101, 101, 101),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      'Description',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: greenColor,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      desc,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.bold,
+                        color: Color.fromARGB(255, 101, 101, 101),
+                      ),
+                      textAlign: TextAlign.start,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            GestureDetector(
+              onTap: () async {
+                try {
+                  final voucherDetail = await ApiService.getVoucherDetail(token, 1);
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return VoucherDetailDialog(
+                        name: voucherDetail['reward_name'], // Match API response keys
+                        cost: voucherDetail['points_required'],
+                        desc: voucherDetail['description'],
+                        voucherId: 1,
+                        token: token,
+                      );
+                    },
+                  );
+                } catch (e) {
+                  print('Error fetching voucher details: $e'); // Debugging
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Failed to fetch voucher detail: $e')),
+                  );
+                }
+              },
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                decoration: BoxDecoration(
+                  borderRadius: const BorderRadius.vertical(
+                    bottom: Radius.circular(16),
+                  ),
+                  color: greenColor,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 12.0),
+                      child: Text(
+                        'Tukar',
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    Icon(
+                      Icons.chevron_right,
+                      color: Colors.white,
+                      size: 24,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

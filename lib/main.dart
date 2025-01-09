@@ -7,6 +7,7 @@ import 'package:nyampah_app/screens/home/trash_tracker_screen.dart';
 import 'package:nyampah_app/screens/home/voucher_screen.dart';
 import 'package:nyampah_app/screens/onboarding/onboarding_screen.dart';
 import 'package:nyampah_app/theme/navbar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 late List<CameraDescription> _cameras;
 
@@ -34,7 +35,6 @@ class MainNavigator extends StatefulWidget {
   @override
   _MainNavigatorState createState() => _MainNavigatorState();
 }
-
 class _MainNavigatorState extends State<MainNavigator> {
   int _currentIndex = 2;
 
@@ -45,6 +45,26 @@ class _MainNavigatorState extends State<MainNavigator> {
     const ProfilePage(),
     const TrashHistory(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadLastSelectedIndex();
+  }
+
+  // Load the last selected index from SharedPreferences
+  Future<void> _loadLastSelectedIndex() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _currentIndex = prefs.getInt('navbar_index') ?? 2; // Default to index 2
+    });
+  }
+
+  // Save the selected index to SharedPreferences
+  Future<void> _saveSelectedIndex(int index) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('navbar_index', index);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,10 +81,12 @@ class _MainNavigatorState extends State<MainNavigator> {
             right: 0,
             child: FloatingBottomNav(
               selectedIndex: _currentIndex,
-              onTap: (index) {
+              onTap: (index) async {
+                // Update state and save to SharedPreferences
                 setState(() {
                   _currentIndex = index;
                 });
+                await _saveSelectedIndex(index);
               },
             ),
           ),

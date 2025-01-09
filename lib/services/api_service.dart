@@ -3,8 +3,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  static const String baseUrl = 'https://289a-36-73-34-81.ngrok-free.app/api/v1';
-
+  static const String baseUrl = 'https://151f-180-245-135-167.ngrok-free.app/api/v1';
   static Future<Map<String, dynamic>> registerUser(String name, String email, String password) async {
     final url = Uri.parse('$baseUrl/register');
 
@@ -204,7 +203,7 @@ class ApiService {
       throw Exception('Failed to redeem voucher: ${response.body}');
     }
   }
-  
+
   static Future<Map<String, dynamic>> updateProfile({
     required String token,
     String? name,

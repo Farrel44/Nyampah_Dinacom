@@ -101,7 +101,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         ),
                         SizedBox(height: 20 * scale),
                         _isLoading
-                            ? CircularProgressIndicator()
+                            ? CircularProgressIndicator(
+                              color: const Color(0xFF00693E),
+                            )
                             : ElevatedButton(
                                 onPressed: () async {
                                   setState(() {
@@ -272,6 +274,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         TextField(
           controller: controller,
           obscureText: isPassword && !passwordVisibility,
+          cursorColor: const Color(0xFF00693E),
           decoration: InputDecoration(
             isDense: true,
             filled: true,

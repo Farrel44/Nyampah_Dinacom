@@ -70,10 +70,9 @@ class _ProfilePageState extends State<ProfilePage> {
                         children: [
                           ClipOval(
                             child: Image.network(
-                              user?['avatar'] ??
-                                  'https://www.pngkey.com/png/full/114-1149878_setting-user-avatar-in-specific-size-without-breaking.png',        
-                              width: constraints.maxWidth * 0.2,
+                              'https://151f-180-245-135-167.ngrok-free.app/storage/${user?['profile_image']}',                              width: constraints.maxWidth * 0.2,
                               height: constraints.maxWidth * 0.2,
+                              fit: BoxFit.cover,
                             ),
                           ),
                           SizedBox(width: constraints.maxWidth * 0.05),
