@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  static const String baseUrl = 'https://nyampah.my.id/api/v1';
+  static const String baseUrl = 'https://289a-36-73-34-81.ngrok-free.app/api/v1';
 
   static Future<Map<String, dynamic>> registerUser(String name, String email, String password) async {
     final url = Uri.parse('$baseUrl/register');
@@ -204,5 +204,67 @@ class ApiService {
       throw Exception('Failed to redeem voucher: ${response.body}');
     }
   }
+  
+  static Future<Map<String, dynamic>> updateProfile({
+    required String token,
+    String? name,
+    String? password,
+    String? profileImagePath,
+  }) async {
+    final uri = Uri.parse('$baseUrl/update');
 
+    final request = http.MultipartRequest('POST', uri)
+      ..headers.addAll({
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token',
+      })
+      ..fields['_method'] = 'PUT';
+
+    // Add optional fields
+    if (name != null && name.isNotEmpty) {
+      request.fields['name'] = name;
+    }
+    if (password != null && password.isNotEmpty) {
+      request.fields['password'] = password;
+    }
+    if (profileImagePath != null && profileImagePath.isNotEmpty) {
+      request.files.add(await http.MultipartFile.fromPath(
+        'profile_image',
+        profileImagePath,
+      ));
+    }
+
+    final response = await request.send();
+
+    if (response.statusCode == 201) {
+      final responseBody = await response.stream.bytesToString();
+      return jsonDecode(responseBody)['data'];
+    } else {
+      final errorResponse = await response.stream.bytesToString();
+      throw Exception('Failed to update profile: $errorResponse');
+    }
+  }
+
+
+  static Future<Map<String, dynamic>> updateProfileImage(String token, File imageFile) async {
+  final url = Uri.parse('$baseUrl/update-profile-image');
+
+  final request = http.MultipartRequest('POST', url)
+    ..headers['Accept'] = 'application/json'
+    ..headers['Authorization'] = 'Bearer $token'
+    ..files.add(await http.MultipartFile.fromPath('profile_image', imageFile.path));
+
+  final response = await request.send();
+
+  if (response.statusCode == 200) {
+    final responseData = await response.stream.bytesToString();
+    return jsonDecode(responseData);
+  } else {
+    final errorResponse = await response.stream.bytesToString();
+    throw Exception('Failed to update profile image: $errorResponse');
+  }
+}
+
+
+  
 }

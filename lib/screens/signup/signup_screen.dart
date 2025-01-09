@@ -17,6 +17,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   bool passwordVisibility = false;
+  bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -99,87 +100,108 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ],
                         ),
                         SizedBox(height: 20 * scale),
-                        ElevatedButton(
-                          onPressed: () async {
-                            final name = usernameController.text.trim();
-                            final email = emailController.text.trim();
-                            final password = passwordController.text;
+                        _isLoading
+                            ? CircularProgressIndicator()
+                            : ElevatedButton(
+                                onPressed: () async {
+                                  setState(() {
+                                    _isLoading = true;
+                                  });
 
-                            if (name.isEmpty ||
-                                email.isEmpty ||
-                                password.isEmpty) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content: Text('Please fill in all fields')),
-                              );
-                              return;
-                            }
+                                  final name = usernameController.text.trim();
+                                  final email = emailController.text.trim();
+                                  final password = passwordController.text;
 
-                            final passwordRegex = RegExp(
-                                r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$');
-                            if (!passwordRegex.hasMatch(password)) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                    'Password must be at least 8 characters long, include 1 lowercase letter, '
-                                    '1 uppercase letter, and 1 number.',
+                                  if (name.isEmpty ||
+                                      email.isEmpty ||
+                                      password.isEmpty) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                          content:
+                                              Text('Please fill in all fields')),
+                                    );
+                                    setState(() {
+                                      _isLoading = false;
+                                    });
+                                    return;
+                                  }
+
+                                  final passwordRegex = RegExp(
+                                      r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$');
+                                  if (!passwordRegex.hasMatch(password)) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                          'Password must be at least 8 characters long, include 1 lowercase letter, '
+                                          '1 uppercase letter, and 1 number.',
+                                        ),
+                                      ),
+                                    );
+                                    setState(() {
+                                      _isLoading = false;
+                                    });
+                                    return;
+                                  }
+
+                                  try {
+                                    final response = await ApiService
+                                        .registerUser(name, email, password);
+
+                                    final prefs =
+                                        await SharedPreferences.getInstance();
+                                    final user = response['data']['user'];
+                                    final token = response['data']['token'];
+
+                                    await prefs.setString(
+                                        'user', jsonEncode(user));
+                                    await prefs.setString('token', token);
+
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                          content: Text(
+                                              'Registration successful!')),
+                                    );
+
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const MainNavigator()),
+                                    );
+                                  } catch (error) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                          content: Text(
+                                              'Registration failed: $error')),
+                                    );
+                                  } finally {
+                                    setState(() {
+                                      _isLoading = false;
+                                    });
+                                  }
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF00693E),
+                                  minimumSize: Size(buttonWidth, 48 * scale),
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 16.0 * scale,
+                                    vertical: 12.0 * scale,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius:
+                                        BorderRadius.circular(8.0 * scale),
                                   ),
                                 ),
-                              );
-                              return;
-                            }
-
-                            try {
-                              final response = await ApiService.registerUser(
-                                  name, email, password);
-
-                              final prefs =
-                                  await SharedPreferences.getInstance();
-                              final user = response['data']['user'];
-                              final token = response['data']['token'];
-
-                              await prefs.setString('user', jsonEncode(user));
-                              await prefs.setString('token', token);
-
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content: Text('Registration successful!')),
-                              );
-
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const MainNavigator()),
-                              );
-                            } catch (error) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                    content:
-                                        Text('Registration failed: $error')),
-                              );
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF00693E),
-                            minimumSize: Size(buttonWidth, 48 * scale),
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 16.0 * scale,
-                              vertical: 12.0 * scale,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8.0 * scale),
-                            ),
-                          ),
-                          child: Text(
-                            'Sign Up',
-                            style: TextStyle(
-                              fontFamily: 'Inter Tight',
-                              color: Colors.white,
-                              fontSize: 15 * scale,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
+                                child: Text(
+                                  'Sign Up',
+                                  style: TextStyle(
+                                    fontFamily: 'Inter Tight',
+                                    color: Colors.white,
+                                    fontSize: 15 * scale,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
                         SizedBox(height: 20 * scale),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,

@@ -1,7 +1,10 @@
+import 'dart:convert';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:nyampah_app/theme/colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert';
 import 'package:nyampah_app/services/api_service.dart';
 
 class VoucherPage extends StatefulWidget {
@@ -71,6 +74,19 @@ class VoucherPageState extends State<VoucherPage> {
       extendBody: true,
       backgroundColor: backgroundColor,
       appBar: AppBar(
+        actions: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            child: Container(
+              width: size.width * 0.225,
+              height: size.width * 0.18,
+              decoration: BoxDecoration(
+                color: greenColor,
+                borderRadius: BorderRadius.circular(basePadding * 1.4),
+              ),
+            ),
+          )
+        ],
         automaticallyImplyLeading: false,
         scrolledUnderElevation: 0,
         backgroundColor: backgroundColor,
@@ -88,235 +104,268 @@ class VoucherPageState extends State<VoucherPage> {
           ),
         ),
       ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : vouchers.isEmpty
-              ? const Center(
-                  child: Text(
-                    "No vouchers available.",
-                    style: TextStyle(
-                      color: greenColor,
-                      fontFamily: 'Inter',
-                      fontSize: 16,
-                    ),
-                  ),
-                )
-              : Padding(
-                  padding: EdgeInsets.all(basePadding),
-                  child: ListView.builder(
-                    itemCount: vouchers.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      final voucher = vouchers[index];
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        child: SizedBox(
-                          width: double.infinity,
-                          height: size.height * 0.15,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Column(
-                              children: [
-                                ClipPath(
-                                  child: Container(
-                                    width: double.infinity,
-                                    height: (size.height * 0.15) * 0.65,
-                                    decoration: BoxDecoration(
-                                      color: greenColor,
-                                      borderRadius: const BorderRadius.only(
-                                        topLeft: Radius.circular(8),
-                                        topRight: Radius.circular(8),
-                                      ),
-                                    ),
-                                    child: Padding(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: basePadding,
-                                        vertical: basePadding / 2,
-                                      ),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            voucher['rewardName'],
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 19,
-                                              fontFamily: 'Inter',
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 2),
-                                          Text(
-                                            voucher['description'],
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 15,
-                                              fontFamily: 'Inter',
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Container(
-                                    width: double.infinity,
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                      vertical: 8,
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          "Klaim Voucher - ${voucher['pointsRequired']} Poin",
-                                          style: const TextStyle(
-                                            color: greenColor,
-                                            fontFamily: 'Inter',
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 14,
-                                          ),
-                                        ),
-                                        GestureDetector(
-                                        onTap: () {
-                                          showDialog(
-                                            context: context,
-                                            builder: (BuildContext context) {
-                                              return AlertDialog(
-                                                titlePadding: const EdgeInsets.all(16),
-                                                title: Row(
-                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                  children: [
-                                                    const Text(
-                                                      'Klaim Voucher',
-                                                      style: TextStyle(
-                                                        fontFamily: 'Inter',
-                                                        fontWeight: FontWeight.bold,
-                                                        fontSize: 18,
-                                                      ),
-                                                    ),
-                                                    GestureDetector(
-                                                      onTap: () {
-                                                        Navigator.of(context).pop(); // Close the dialog
-                                                      },
-                                                      child: const Icon(
-                                                        Icons.close,
-                                                        color: Colors.grey,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                                content: Column(
-                                                  mainAxisSize: MainAxisSize.min,
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: [
-                                                    const Text(
-                                                      "Nama",
-                                                      style: TextStyle(
-                                                        fontFamily: 'Inter',
-                                                        fontSize: 20,
-                                                        fontWeight: FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                    Text(
-                                                      "${voucher['rewardName']}",
-                                                      style: const TextStyle(
-                                                        fontFamily: 'Inter',
-                                                        fontSize: 16,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                                actions: [
-                                                  TextButton(
-                                                    onPressed: () async {
-                                                      // Fetch the token from the user's state or storage
-                                                      if (token != null) {
-                                                        try {
-                                                            final voucherId = vouchers.firstWhere((v) => v['rewardName'] == voucher['rewardName'])['id'];
-                                                            final response = await ApiService.redeemVoucher(token!, voucherId);
-                                                          final voucherCode = response['data']['voucher'];
-
-                                                          // Show a success dialog with the voucher code
-                                                          showDialog(
-                                                            context: context,
-                                                            builder: (BuildContext context) {
-                                                              return AlertDialog(
-                                                                title: const Text('Voucher Redeemed'),
-                                                                content: Text('Your voucher code: $voucherCode'),
-                                                                actions: [
-                                                                  TextButton(
-                                                                    onPressed: () {
-                                                                      Navigator.of(context).pop(); // Close the dialog
-                                                                    },
-                                                                    child: const Text('OK'),
-                                                                  ),
-                                                                ],
-                                                              );
-                                                            },
-                                                          );
-                                                        } catch (e) {
-                                                          // Handle error
-                                                          showDialog(
-                                                            context: context,
-                                                            builder: (BuildContext context) {
-                                                              return AlertDialog(
-                                                                title: const Text('Error'),
-                                                                content: Text('Failed to redeem voucher: $e'),
-                                                                actions: [
-                                                                  TextButton(
-                                                                    onPressed: () {
-                                                                      Navigator.of(context).pop(); // Close the error dialog
-                                                                    },
-                                                                    child: const Text('OK'),
-                                                                  ),
-                                                                ],
-                                                              );
-                                                            },
-                                                          );
-                                                        }
-                                                      } else {
-                                                        // Handle missing token (optional)
-                                                        Navigator.of(context).pop();
-                                                      }
-                                                    },
-                                                    child: const Text(
-                                                      'Klaim',
-                                                      style: TextStyle(
-                                                        color: greenColor,
-                                                        fontFamily: 'Inter',
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              );
-                                            },
-                                          );
-                                        },
-                                        child: const Icon(
-                                          Icons.chevron_right,
-                                          color: greenColor,
-                                        ),
-                                      ),
-
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
+      body: Stack(
+        children: [
+          isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : vouchers.isEmpty
+                  ? const Center(
+                      child: Text(
+                        "No vouchers available.",
+                        style: TextStyle(
+                          color: greenColor,
+                          fontFamily: 'Inter',
+                          fontSize: 16,
                         ),
-                      );
-                    },
+                      ),
+                    )
+                  : Padding(
+                      padding: EdgeInsets.all(basePadding),
+                      child: ListView.builder(
+                        itemCount: vouchers.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          final voucher = vouchers[index];
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            child: SizedBox(
+                              width: double.infinity,
+                              height: size.height * 0.15,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Column(
+                                  children: [
+                                    ClipPath(
+                                      child: Container(
+                                        width: double.infinity,
+                                        height: (size.height * 0.15) * 0.65,
+                                        decoration: BoxDecoration(
+                                          color: greenColor,
+                                          borderRadius: const BorderRadius.only(
+                                            topLeft: Radius.circular(8),
+                                            topRight: Radius.circular(8),
+                                          ),
+                                        ),
+                                        child: Padding(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: basePadding,
+                                            vertical: basePadding / 2,
+                                          ),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                voucher['rewardName'],
+                                                style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 20,
+                                                  fontFamily: 'Inter',
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 2),
+                                              Text(
+                                                voucher['description'],
+                                                style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 15,
+                                                  fontFamily: 'Inter',
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Container(
+                                        width: double.infinity,
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 16,
+                                          vertical: 8,
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              "Klaim Voucher - ${voucher['pointsRequired']} Poin",
+                                              style: const TextStyle(
+                                                color: greenColor,
+                                                fontFamily: 'Inter',
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 14,
+                                              ),
+                                            ),
+                                            GestureDetector(
+                                              onTap: () {
+                                                // Redeem Logic here
+                                              },
+                                              child: const Icon(
+                                                Icons.chevron_right,
+                                                color: greenColor,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+        ],
+      ),
+    );
+  }
+}
+
+class RedeemDialog extends StatelessWidget {
+  final String name;
+  final int cost;
+  final String code;
+  final String time;
+
+  const RedeemDialog({
+    Key? key,
+    required this.name,
+    required this.cost,
+    required this.code,
+    required this.time,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: MediaQuery.of(context).size.width * 0.9,
+          maxHeight: MediaQuery.of(context).size.height * 0.57,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Align(
+                alignment: Alignment.topRight,
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Icon(Icons.close, color: Colors.black),
+                ),
+              ),
+              Center(
+                child: SvgPicture.asset(
+                  'assets/images/daun-redeem.svg',
+                  height: 120,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Center(
+                child: Text(
+                  "Penukaran Berhasil!",
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: greenColor,
                   ),
                 ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                "Nama",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: greenColor,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                name,
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                "Biaya",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: greenColor,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                "$cost points",
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                "Kode Voucher",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: greenColor,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                code,
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                "Ditukar pada",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: greenColor,
+                ),
+              ),
+              Text(
+                time,
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey,
+                ),
+              ),
+              const SizedBox(height: 4),
+              const Spacer(),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

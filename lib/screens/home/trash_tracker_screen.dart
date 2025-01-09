@@ -15,7 +15,7 @@ class TrashHistory extends StatefulWidget {
 class _TrashHistoryState extends State<TrashHistory> {
   Map<String, dynamic>? user;
   String? token;
-
+  String selectedPeriod = 'day'; 
   @override
   void initState() {
     super.initState();
@@ -71,31 +71,46 @@ class _TrashHistoryState extends State<TrashHistory> {
                 Row(
                   children: [
                     SelectButtonPeriod(
-                      onPressed: () {},
+                      onPressed: () {
+                        setState(() {
+                          selectedPeriod = 'day';
+                        });
+                      },
                       size: size,
                       basePadding: basePadding,
                       title: "Daily",
+                      isSelected: selectedPeriod == 'day',
                     ),
                     SizedBox(width: size.width * 0.02),
                     SelectButtonPeriod(
-                      onPressed: () {},
+                      onPressed: () {
+                        setState(() {
+                          selectedPeriod = 'week';
+                        });
+                      },
                       size: size,
                       basePadding: basePadding,
                       title: "Weekly",
+                      isSelected: selectedPeriod == 'week',
                     ),
                     SizedBox(width: size.width * 0.02),
                     SelectButtonPeriod(
-                      onPressed: () {},
+                      onPressed: () {
+                        setState(() {
+                          selectedPeriod = 'month';
+                        });
+                      },
                       size: size,
                       basePadding: basePadding,
                       title: "Monthly",
+                      isSelected: selectedPeriod == 'month',
                     ),
                   ],
                 ),
                 SizedBox(height: basePadding),
                 Expanded(
                   child: FutureBuilder<List<Map<String, dynamic>>>(
-                    future: token != null ? ApiService.getTrashByGroupData(token!, 'week') : Future.value([]), // Replace 'week' with desired period
+                    future: token != null ? ApiService.getTrashByGroupData(token!, selectedPeriod) : Future.value([]),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Center(child: CircularProgressIndicator());
@@ -131,84 +146,87 @@ class _TrashHistoryState extends State<TrashHistory> {
                                     )
                                   ],
                                 ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                      width: constraints.maxWidth,
-                                      height: constraints.maxHeight * 0.65,
-                                      clipBehavior: Clip.antiAlias,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.only(
-                                          topLeft: Radius.circular(basePadding),
-                                          topRight: Radius.circular(basePadding),
+                                child: SingleChildScrollView(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.max,
+                                    children: [
+                                      Container(
+                                        width: constraints.maxWidth,
+                                        height: constraints.maxHeight * 0.60,
+                                        clipBehavior: Clip.antiAlias,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.only(
+                                            topLeft: Radius.circular(basePadding),
+                                            topRight: Radius.circular(basePadding),
+                                          ),
                                         ),
-                                      ),
-                                      child: Image.network(
-                                        trash['trash_image'] ?? '', // Use API image URL
-                                        fit: BoxFit.cover,
-                                        errorBuilder: (context, error, stackTrace) => Image.asset(
-                                          'assets/images/sampah.jpeg', // Fallback image
+                                        child: Image.network(
+                                          trash['trash_image'] ?? '', // Use API image URL
                                           fit: BoxFit.cover,
+                                          errorBuilder: (context, error, stackTrace) => Image.asset(
+                                            'assets/images/sampah.jpeg', // Fallback image
+                                            fit: BoxFit.cover,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(12),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Expanded(
-                                                child: Text(
-                                                  trash['trash_name'] ?? 'Unknown',
-                                                  style: TextStyle(
-                                                    fontSize: size.width * 0.035,
-                                                    fontFamily: 'Inter',
-                                                    color: greenColor,
-                                                    fontWeight: FontWeight.bold,
+                                      Padding(
+                                        padding: const EdgeInsets.all(12),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                Expanded(
+                                                  child: Text(
+                                                    trash['trash_name'] ?? 'Unknown',
+                                                    style: TextStyle(
+                                                      fontSize: size.width * 0.035,
+                                                      fontFamily: 'Inter',
+                                                      color: greenColor,
+                                                      fontWeight: FontWeight.bold,
+                                                    ),
                                                   ),
                                                 ),
-                                              ),
-                                              const Icon(
-                                                Icons.warning_amber_rounded,
-                                                color: Colors.orange,
-                                                size: 22,
-                                              ),
-                                            ],
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            trash['trash_category_name'] ?? 'Unknown',
-                                            style: TextStyle(
-                                              color: greenWithOpacity,
-                                              fontSize: size.width * 0.035,
-                                              fontFamily: 'Inter',
-                                              fontWeight: FontWeight.bold,
+                                                const Icon(
+                                                  Icons.warning_amber_rounded,
+                                                  color: Colors.orange,
+                                                  size: 22,
+                                                ),
+                                              ],
                                             ),
-                                          ),
-                                          const SizedBox(height: 8),
-                                          Text(
-                                            trash['created_at'] != null
-                                                ? DateTime.parse(trash['created_at'])
-                                                    .toLocal()
-                                                    .toString()
-                                                    .split(' ')[0]
-                                                : 'Unknown Date',
-                                            style: TextStyle(
-                                              color: greenColor,
-                                              fontFamily: 'Inter',
-                                              fontSize: size.width * 0.032,
-                                              fontWeight: FontWeight.bold,
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              trash['trash_category_name'] ?? 'Unknown',
+                                              style: TextStyle(
+                                                color: greenWithOpacity,
+                                                fontSize: size.width * 0.035,
+                                                fontFamily: 'Inter',
+                                                fontWeight: FontWeight.bold,
+                                              ),
                                             ),
-                                          ),
-                                        ],
+                                            const SizedBox(height: 8),
+                                            Text(
+                                              trash['created_at'] != null
+                                                  ? DateTime.parse(trash['created_at'])
+                                                      .toLocal()
+                                                      .toString()
+                                                      .split(' ')[0]
+                                                  : 'Unknown Date',
+                                              style: TextStyle(
+                                                color: greenColor,
+                                                fontFamily: 'Inter',
+                                                fontSize: size.width * 0.032,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               );
                             },
@@ -218,7 +236,6 @@ class _TrashHistoryState extends State<TrashHistory> {
                     },
                   ),
                 ),
-
               ],
             ),
           ),
@@ -245,12 +262,14 @@ class SelectButtonPeriod extends StatelessWidget {
     required this.size,
     required this.basePadding,
     required this.onPressed,
+    required this.isSelected,
   });
 
   final String title;
   final Size size;
   final double basePadding;
   final VoidCallback onPressed;
+  final bool isSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -259,7 +278,7 @@ class SelectButtonPeriod extends StatelessWidget {
       height: size.height * 0.04,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.white,
+          backgroundColor: isSelected ? greenColor : Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(basePadding),
           ),
@@ -270,7 +289,7 @@ class SelectButtonPeriod extends StatelessWidget {
           style: TextStyle(
             fontFamily: 'Inter',
             fontSize: size.width * 0.032,
-            color: greenColor,
+            color: isSelected ? Colors.white : greenColor,
             fontWeight: FontWeight.bold,
           ),
         ),

@@ -5,7 +5,6 @@ import 'package:nyampah_app/theme/colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
-
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
 
@@ -20,7 +19,9 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
-    loadUserData();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      loadUserData();
+    });
   }
 
   Future<void> loadUserData() async {
@@ -34,6 +35,10 @@ class _ProfilePageState extends State<ProfilePage> {
         token = userToken;
       });
     }
+  }
+
+  Future<void> reloadUserData() async {
+    await loadUserData();
   }
 
   @override
@@ -64,8 +69,9 @@ class _ProfilePageState extends State<ProfilePage> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           ClipOval(
-                            child: Image.asset(
-                              'assets/images/placeholder_image.png',
+                            child: Image.network(
+                              user?['avatar'] ??
+                                  'https://www.pngkey.com/png/full/114-1149878_setting-user-avatar-in-specific-size-without-breaking.png',        
                               width: constraints.maxWidth * 0.2,
                               height: constraints.maxWidth * 0.2,
                             ),
@@ -86,29 +92,29 @@ class _ProfilePageState extends State<ProfilePage> {
                                       fontSize: constraints.maxWidth * 0.06),
                                 ),
                               ),
-                                SizedBox(
-                                width: constraints.maxWidth * 0.5, 
+                              SizedBox(
+                                width: constraints.maxWidth * 0.5,
                                 child: Text(
                                   "${user?['email'] ?? 'Email Pengguna'}",
                                   style: TextStyle(
-                                    color: greenWithOpacity,
-                                    fontFamily: 'Inter',
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: constraints.maxWidth * 0.05),
+                                      color: greenWithOpacity,
+                                      fontFamily: 'Inter',
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: constraints.maxWidth * 0.05),
                                   overflow: TextOverflow.ellipsis,
                                 ),
-                                ),
-                              
+                              ),
                               Row(
                                 children: [
                                   GestureDetector(
-                                    onTap: () {
-                                      Navigator.of(context).push(
+                                    onTap: () async {
+                                      await Navigator.of(context).push(
                                         MaterialPageRoute(
                                           builder: (context) =>
                                               const EditProfile(),
                                         ),
                                       );
+                                      reloadUserData();
                                     },
                                     child: Text(
                                       "Edit Profil",

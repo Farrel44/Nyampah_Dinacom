@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:nyampah_app/theme/colors.dart';
+import 'package:nyampah_app/services/api_service.dart';
 
 class EditProfile extends StatefulWidget {
   const EditProfile({super.key});
@@ -14,7 +15,6 @@ class EditProfile extends StatefulWidget {
 
 class _EditProfileState extends State<EditProfile> {
   final TextEditingController usernameController = TextEditingController();
-  final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   Map<String, dynamic>? user;
   String? token;
@@ -38,6 +38,9 @@ class _EditProfileState extends State<EditProfile> {
   void initState() {
     super.initState();
     loadUserData();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      loadUserData();
+    });
   }
 
   Future<void> loadUserData() async {
@@ -138,9 +141,6 @@ class _EditProfileState extends State<EditProfile> {
                       _buildTextInput(
                           usernameController, 'Update your username'),
                       SizedBox(height: size.height * 0.015),
-                      _buildLabel('Email'),
-                      _buildTextInput(emailController, 'Update your email'),
-                      SizedBox(height: size.height * 0.015),
                       _buildLabel('Password'),
                       _buildTextInput(
                           passwordController, 'Update your password',
@@ -157,8 +157,69 @@ class _EditProfileState extends State<EditProfile> {
                       width: size.width / 3,
                       height: size.height * 0.045,
                       child: ElevatedButton(
-                        onPressed: () {
-                          // Submit action logic here
+                        onPressed: () async {
+                          try {
+                            if (token == null) {
+                              throw Exception("Token is not available. Please log in again.");
+                            }
+
+                            final String username = usernameController.text.trim();
+                            final String password = passwordController.text.trim();
+                            String? profileImagePath = image?.path;
+
+                            bool hasUpdates = false;
+
+                            if (username.isNotEmpty && username != user?['name']) {
+                              hasUpdates = true;
+                            }
+
+                            if (password.isNotEmpty) {
+                              hasUpdates = true;
+                            }
+
+                            if (profileImagePath != null) {
+                              hasUpdates = true;
+                            }
+
+                            if (!hasUpdates) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text("No changes to update.")),
+                              );
+                              return;
+                            }
+
+                            final updatedData = await ApiService.updateProfile(
+                              token: token!,
+                              name: username.isNotEmpty ? username : null,
+                              password: password.isNotEmpty ? password : null,
+                              profileImagePath: profileImagePath,
+                            );
+
+                            if (updatedData.containsKey('name')) {
+                              user?['name'] = updatedData['name'];
+                            }
+                            if (updatedData.containsKey('password')) {
+                              user?['password'] = password;
+                            }
+                            if (updatedData.containsKey('profile_image')) {
+                              user?['profile_image'] = updatedData['profile_image'];
+                            }
+
+                            final prefs = await SharedPreferences.getInstance();
+                            prefs.setString('user', jsonEncode(user));
+
+                            await loadUserData();
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text("Profile updated successfully!")),
+                            );
+
+                            Navigator.pop(context);
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text("Error: $e")),
+                            );
+                          }
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
