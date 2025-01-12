@@ -17,6 +17,10 @@ void main() async {
   runApp(const MyApp());
 }
 
+class AppConfig {
+  final baseURL = 'https://3d15-36-73-32-64.ngrok-free.app'; 
+}
+
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 

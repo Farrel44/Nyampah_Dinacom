@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nyampah_app/main.dart';
 import 'package:nyampah_app/screens/login/login_screen.dart';
-import 'package:nyampah_app/services/api_service.dart';
+import 'package:nyampah_app/services/user_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
@@ -146,7 +146,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   }
 
                                   try {
-                                    final response = await ApiService
+                                    final response = await UserService
                                         .registerUser(name, email, password);
 
                                     final prefs =
@@ -157,6 +157,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     await prefs.setString(
                                         'user', jsonEncode(user));
                                     await prefs.setString('token', token);
+                                    await prefs.setBool('isLogin', true);
 
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(

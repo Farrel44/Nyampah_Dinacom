@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:nyampah_app/theme/colors.dart';
-import 'package:nyampah_app/services/api_service.dart';
+import 'package:nyampah_app/services/user_service.dart';
+import 'package:nyampah_app/main.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -37,7 +38,7 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         user = jsonDecode(userData);
         token = userToken;
-        leaderboardFuture = ApiService.getLeaderboard(token!);
+        leaderboardFuture = UserService.getLeaderboard(token!);
       });
     }
 
@@ -48,12 +49,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> refreshLeaderboard() async {
     setState(() {
-      leaderboardFuture = ApiService.getLeaderboard(token!);
+      leaderboardFuture = UserService.getLeaderboard(token!);
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final baseUrl = AppConfig().baseURL;
     final size = MediaQuery.of(context).size;
 
     // Calculate responsive dimensions
@@ -114,14 +116,29 @@ class _HomeScreenState extends State<HomeScreen> {
                                       ],
                                     ),
                                   ),
-                                    ClipOval(
-                                    child: Image.network(
-                                      'https://151f-180-245-135-167.ngrok-free.app/storage/${user?['profile_image']}',
-                                      width: profileImageSize,
-                                      height: profileImageSize,
-                                      fit: BoxFit.cover,
-                                    ),
-                                    )
+                                      ClipOval(
+                                        child: user?['profile_image'] != null
+                                          ? Image.network(
+                                              '$baseUrl/storage/profile_images/${user?['profile_image']}',
+                                              width: constraints.maxWidth * 0.2,
+                                              height: constraints.maxWidth * 0.2,
+                                              fit: BoxFit.cover,
+                                              errorBuilder: (context, error, stackTrace) {
+                                                return Image.asset(
+                                                  'assets/images/placeholder_image.png',
+                                                  width: constraints.maxWidth * 0.2,
+                                                  height: constraints.maxWidth * 0.2,
+                                                  fit: BoxFit.cover,
+                                                );
+                                              },
+                                            )
+                                          : Image.asset(
+                                              'assets/images/placeholder_image.png',
+                                              width: constraints.maxWidth * 0.2,
+                                              height: constraints.maxWidth * 0.2,
+                                              fit: BoxFit.cover,
+                                            ),
+                                      )
                                 ],
                               ),
                               SizedBox(height: basePadding),
@@ -139,6 +156,19 @@ class _HomeScreenState extends State<HomeScreen> {
                                   padding: EdgeInsets.all(basePadding),
                                   child: LayoutBuilder(
                                     builder: (context, cardConstraints) {
+                                      double calculateProgress(int exp) {
+                                        if (exp < 5000) {
+                                          return exp / 5000; // Bronze rank progress
+                                        } else if (exp < 10000) {
+                                          return (exp - 5000) / 5000; // Silver rank progress
+                                        } else if (exp < 15000) {
+                                          return (exp - 10000) / 5000; // Gold rank progress
+                                        } else if (exp < 20000) {
+                                          return (exp - 15000) / 5000; // Platinum rank progress
+                                        } else {
+                                          return 1.0; // Diamond rank (progress full)
+                                        }
+                                      }
                                       final double titleSize =
                                           (cardConstraints.maxWidth * 0.08)
                                               .clamp(20.0, 24.0);
@@ -149,6 +179,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           (cardConstraints.maxWidth * 0.025)
                                               .clamp(6.0, 10.0);
                                       final points = user?['points'] ?? 0;
+                                      final exp = user?['exp'] ?? 0;
 
                                       return Column(
                                         mainAxisAlignment: MainAxisAlignment.center,
@@ -187,7 +218,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                               height: progressBarHeight,
                                               child: LinearProgressIndicator(
                                                 value:
-                                                    (points / 1000).clamp(0.0, 1.0),
+                                                    calculateProgress(exp),
                                                 color: greenColor,
                                                 backgroundColor: greenWhite,
                                               ),
@@ -197,7 +228,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                               height:
                                                   cardConstraints.maxHeight * 0.04),
                                           Text(
-                                            '${1000 - (points % 1000)} Points Left',
+                                            '${1000 - (exp % 1000)} Exp Left',
                                             style: TextStyle(
                                               color: greenWithOpacity,
                                               fontFamily: 'Inter',
@@ -273,7 +304,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             future: leaderboardFuture,
                                             builder: (context, snapshot) {
                                               if (snapshot.connectionState == ConnectionState.waiting) {
-                                                return const Center(child: CircularProgressIndicator());
+                                                return const Center(child: CircularProgressIndicator(color: Color(0xFF00693E)));
                                               } else if (snapshot.hasError) {
                                                 return Center(child: Text('Error: ${snapshot.error}'));
                                               } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -309,19 +340,27 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                 ),
                                                                 const SizedBox(width: 20),
                                                                 ClipOval(
-                                                                  child: user['profile_image'] != null
+                                                                  child: user?['profile_image'] != null
                                                                     ? Image.network(
-                                                                      'https://151f-180-245-135-167.ngrok-free.app/storage/${user['profile_image']}',
-                                                                      width: 40,
-                                                                      height: 40,
-                                                                      fit: BoxFit.cover,
-                                                                    )
+                                                                        '$baseUrl/storage/profile_images/${user?['profile_image']}',
+                                                                        width: constraints.maxWidth * 0.2,
+                                                                        height: constraints.maxWidth * 0.2,
+                                                                        fit: BoxFit.cover,
+                                                                        errorBuilder: (context, error, stackTrace) {
+                                                                          return Image.asset(
+                                                                            'assets/images/placeholder_image.png',
+                                                                            width: constraints.maxWidth * 0.2,
+                                                                            height: constraints.maxWidth * 0.2,
+                                                                            fit: BoxFit.cover,
+                                                                          );
+                                                                        },
+                                                                      )
                                                                     : Image.asset(
-                                                                      'assets/images/placeholder_image.png',
-                                                                      width: 40,
-                                                                      height: 40,
-                                                                      fit: BoxFit.cover,
-                                                                    ),
+                                                                        'assets/images/placeholder_image.png',
+                                                                        width: constraints.maxWidth * 0.2,
+                                                                        height: constraints.maxWidth * 0.2,
+                                                                        fit: BoxFit.cover,
+                                                                      ),
                                                                 ),
                                                                 const SizedBox(width: 20),
                                                                 Column(

@@ -4,7 +4,9 @@ import 'dart:io';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:nyampah_app/theme/colors.dart';
-import 'package:nyampah_app/services/api_service.dart';
+import 'package:nyampah_app/main.dart';
+import 'package:nyampah_app/services/user_service.dart';
+
 
 class EditProfile extends StatefulWidget {
   const EditProfile({super.key});
@@ -58,6 +60,7 @@ class _EditProfileState extends State<EditProfile> {
 
   @override
   Widget build(BuildContext context) {
+    final baseUrl = AppConfig().baseURL;
     final size = MediaQuery.of(context).size;
     final double basePadding = size.width * 0.05;
     final double profileSize = size.width * 0.28;
@@ -91,18 +94,25 @@ class _EditProfileState extends State<EditProfile> {
                   children: [
                     ClipOval(
                       child: image != null
-                          ? Image.file(
-                              image!,
-                              fit: BoxFit.cover,
-                              width: profileSize,
-                              height: profileSize,
-                            )
-                          : Image.network(
-                              'https://151f-180-245-135-167.ngrok-free.app/storage/${user?['profile_image']}',
-                              fit: BoxFit.cover,
-                              width: profileSize,
-                              height: profileSize,
-                            ),
+                        ? Image.file(
+                          image!,
+                          fit: BoxFit.cover,
+                          width: profileSize,
+                          height: profileSize,
+                        )
+                        : user?['profile_image'] != null
+                          ? Image.network(
+                            '$baseUrl/storage/${user?['profile_image']}',
+                            width: profileSize,
+                            height: profileSize,
+                            fit: BoxFit.cover,
+                          )
+                          : Image.asset(
+                            'assets/images/placeholder_image.png',
+                            width: profileSize,
+                            height: profileSize,
+                            fit: BoxFit.cover,
+                          ),
                     ),
                     Positioned(
                       bottom: 0,
@@ -188,7 +198,7 @@ class _EditProfileState extends State<EditProfile> {
                               return;
                             }
 
-                            final updatedData = await ApiService.updateProfile(
+                            final updatedData = await UserService.updateProfile(
                               token: token!,
                               name: username.isNotEmpty ? username : null,
                               password: password.isNotEmpty ? password : null,

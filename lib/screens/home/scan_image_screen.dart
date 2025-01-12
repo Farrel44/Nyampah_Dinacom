@@ -1,7 +1,7 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:nyampah_app/theme/colors.dart';
-import 'package:nyampah_app/services/api_service.dart';
+import 'package:nyampah_app/services/scan_service.dart';
 import 'dart:io';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
@@ -32,7 +32,7 @@ class _ScanImageState extends State<ScanImage> with TickerProviderStateMixin {
   Future<void> _initializeCamera(CameraDescription camera) async {
     _cameraController = CameraController(
       camera,
-      ResolutionPreset.ultraHigh,
+      ResolutionPreset.low,
     );
     await _cameraController!.initialize();
     setState(() {});
@@ -114,7 +114,7 @@ class _ScanImageState extends State<ScanImage> with TickerProviderStateMixin {
 
                       final image = await _cameraController!.takePicture();
 
-                      final response = await ApiService.scanImage(token!, File(image.path));
+                      final response = await ScanService.scanImage(token!, File(image.path));
 
                       var category = response['category'];
                       if (category == 'Undefined') {
@@ -162,6 +162,7 @@ class _ScanImageState extends State<ScanImage> with TickerProviderStateMixin {
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
                                         Column(
+                                          mainAxisSize: MainAxisSize.min,
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             Text(
@@ -173,13 +174,16 @@ class _ScanImageState extends State<ScanImage> with TickerProviderStateMixin {
                                                 fontWeight: FontWeight.bold,
                                               ),
                                             ),
-                                            Text(
-                                              trashName,
-                                              style: TextStyle(
-                                                fontSize: basePadding * 1.3,
-                                                fontFamily: 'Inter',
-                                                color: greenColor,
-                                                fontWeight: FontWeight.bold,
+                                            Flexible(
+                                              child: Text(
+                                                trashName,
+                                                style: TextStyle(
+                                                  fontSize: basePadding * 1.3,
+                                                  fontFamily: 'Inter',
+                                                  color: greenColor,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                                overflow: TextOverflow.ellipsis,
                                               ),
                                             ),
                                           ],
@@ -188,17 +192,20 @@ class _ScanImageState extends State<ScanImage> with TickerProviderStateMixin {
                                           width: 50,
                                           height: 50,
                                           child: ElevatedButton(
+                                            onPressed: () {
+                                              // Add functionality here
+                                            },
                                             style: ElevatedButton.styleFrom(
-                                              backgroundColor: leaderBoardTitleColor,
+                                              backgroundColor: leaderBoardTitleColor, // Use your custom color
                                               shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(10),
+                                                borderRadius: BorderRadius.circular(10), // Rounded corners
                                               ),
-                                              alignment: Alignment.center,
+                                              padding: EdgeInsets.zero, // Ensures proper alignment of the icon
                                             ),
-                                            onPressed: () {},
                                             child: Icon(
-                                              Icons.warning_amber_rounded,
-                                              color: Colors.white,
+                                              Icons.warning_amber_rounded, // Icon to display
+                                              color: Colors.white, // Icon color
+                                              size: 24, // Icon size (default is fine, but you can adjust)
                                             ),
                                           ),
                                         ),

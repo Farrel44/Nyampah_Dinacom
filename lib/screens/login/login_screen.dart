@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nyampah_app/screens/signup/signup_screen.dart';
 import 'package:nyampah_app/main.dart';
-import 'package:nyampah_app/services/api_service.dart';
+import 'package:nyampah_app/services/user_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
@@ -93,8 +93,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         SizedBox(height: 20 * scale),
                         _isLoading
                             ? CircularProgressIndicator(
-                              color: const Color(0xFF00693E),
-                            )
+                                color: const Color(0xFF00693E),
+                              )
                             : ElevatedButton(
                                 onPressed: () async {
                                   setState(() {
@@ -105,8 +105,42 @@ class _LoginScreenState extends State<LoginScreen> {
                                   final password = passwordController.text;
 
                                   if (email.isEmpty || password.isEmpty) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text('Please fill in all fields')),
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) => AlertDialog(
+                                        title: const Text('Error'),
+                                        content: const Text('Please fill in all fields'),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () => Navigator.pop(context),
+                                            child: const Text('OK'),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                    setState(() {
+                                      _isLoading = false;
+                                    });
+                                    return;
+                                  }
+
+                                  if (password.length < 8) {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) => AlertDialog(
+                                        backgroundColor: const Color(0xFFF5F4ED),
+                                        title: const Text('Error'),
+                                        content: const Text('Password harus minimal memiliki 8 karakter'),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () => Navigator.pop(context),
+                                            child: const Text(
+                                              'OK',
+                                              style: TextStyle(color: Color(0xFFFF8302)),
+                                            ),
+                                            ),
+                                        ],
+                                      ),
                                     );
                                     setState(() {
                                       _isLoading = false;
@@ -115,7 +149,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   }
 
                                   try {
-                                    final response = await ApiService.loginUser(email, password);
+                                    final response = await UserService.loginUser(email, password);
 
                                     final prefs = await SharedPreferences.getInstance();
                                     final user = response['data']['user'];
@@ -123,6 +157,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                                     await prefs.setString('user', jsonEncode(user));
                                     await prefs.setString('token', token);
+                                    await prefs.setBool('isLogin', true);
 
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(content: Text('Login successful!')),
@@ -133,8 +168,22 @@ class _LoginScreenState extends State<LoginScreen> {
                                       MaterialPageRoute(builder: (context) => const MainNavigator()),
                                     );
                                   } catch (error) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text('Login failed: $error')),
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) => AlertDialog(
+                                        backgroundColor: const Color(0xFFF5F4ED),
+                                        title: const Text('Login Failed'),
+                                        content: const Text('Email atau Password salah'),
+                                        actions: [
+                                            TextButton(
+                                            onPressed: () => Navigator.pop(context),
+                                            child: const Text(
+                                              'OK',
+                                              style: TextStyle(color: Color(0xFFFF8302)),
+                                            ),
+                                            ),
+                                        ],
+                                      ),
                                     );
                                   } finally {
                                     setState(() {
