@@ -53,12 +53,12 @@ class AchievementPageState extends State<AchievementPage> {
           user = userData;
         });
       } else {
-        throw Exception('Token not found');
+        throw Exception('Token tidak ditemukan');
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to update user data: $e')),
+          SnackBar(content: Text('Gagal memperbarui data pengguna!')),
         );
       }
     }
@@ -71,7 +71,7 @@ class AchievementPageState extends State<AchievementPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Achievement claimed successfully!'),
+            content: Text('Pencapaian berhasil diklaim!'),
             backgroundColor: greenColor,
           ),
         );
@@ -82,7 +82,7 @@ class AchievementPageState extends State<AchievementPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to claim achievement: $e'),
+            content: Text('Gagal mengklaim prestasi!'),
             backgroundColor: Colors.red,
           ),
         );
@@ -114,7 +114,7 @@ class AchievementPageState extends State<AchievementPage> {
           isLoading = false;
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to fetch vouchers!')),
+          SnackBar(content: Text('Gagal mengambil data prestasi!')),
         );
       }
     }
@@ -137,7 +137,7 @@ class AchievementPageState extends State<AchievementPage> {
         title: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 1),
           child: Text(
-            "Rank & Achievements",
+            "Peringkat & Prestasi",
             style: TextStyle(
               color: greenColor,
               fontFamily: 'Inter',
@@ -198,7 +198,7 @@ class AchievementPageState extends State<AchievementPage> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          '${user?['rank'] ?? 'Rank'}',
+                          '${user?['rank'] ?? 'Peringkat'}',
                           style: TextStyle(
                             color: greenColor,
                             fontFamily: 'Inter',
@@ -208,7 +208,7 @@ class AchievementPageState extends State<AchievementPage> {
                         ),
                         SizedBox(height: cardConstraints.maxHeight * 0.02),
                         Text(
-                          '$points Points',
+                          '$points Poin',
                           style: TextStyle(
                             color: greenWithOpacity,
                             fontFamily: 'Inter',
@@ -232,7 +232,7 @@ class AchievementPageState extends State<AchievementPage> {
                         ),
                         SizedBox(height: cardConstraints.maxHeight * 0.04),
                         Text(
-                          '${1000 - (exp % 1000)} Exp left to next rank',
+                          '${1000 - (exp % 1000)} Exp tersisa ke peringkat berikutnya',
                           style: TextStyle(
                             color: greenWithOpacity,
                             fontFamily: 'Inter',
@@ -288,7 +288,7 @@ class AchievementPageState extends State<AchievementPage> {
                           ),
                           SizedBox(width: size.width * 0.04),
                           const Text(
-                            'Achievements',
+                            'Pencapaian',
                             style: TextStyle(
                               fontFamily: 'Inter',
                               fontSize: 24,
@@ -319,7 +319,7 @@ class AchievementPageState extends State<AchievementPage> {
                           
                           if (!snapshot.hasData || snapshot.data!.isEmpty) {
                             return const Center(
-                              child: Text('No achievements available')
+                              child: Text('Tidak ada pencapaian yang tersedia')
                             );
                           }
 
@@ -384,13 +384,13 @@ class AchievementPageState extends State<AchievementPage> {
                                                       final userData = await UserService.getUserByName(token);
                                                       await prefs.setString('user', jsonEncode(userData));
                                                     } else {
-                                                      throw Exception('Token not found');
+                                                      throw Exception('Token tidak ditemukan');
                                                     }
                                                   } catch (e) {
                                                     if (mounted) {
                                                       ScaffoldMessenger.of(context).showSnackBar(
                                                         SnackBar(
-                                                          content: Text('Failed to fetch user data: $e'),
+                                                          content: Text('Gagal mengambil data pengguna: '),
                                                         ),
                                                       );
                                                     }

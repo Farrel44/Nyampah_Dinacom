@@ -58,7 +58,7 @@ class VoucherPageState extends State<VoucherPage> {
           isLoading = false;
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to fetch vouchers!')),
+          SnackBar(content: Text('Gagal mengambil data voucher!')),
         );
       }
     }
@@ -123,7 +123,7 @@ class VoucherPageState extends State<VoucherPage> {
               : vouchers.isEmpty
                   ? const Center(
                       child: Text(
-                        "No vouchers available.",
+                        "Tidak ada voucher yang tersedia.",
                         style: TextStyle(
                           color: greenColor,
                           fontFamily: 'Inter',
@@ -232,7 +232,7 @@ class VoucherPageState extends State<VoucherPage> {
                                                   } 
                                                   catch (e) {
                                                   ScaffoldMessenger.of(context).showSnackBar(
-                                                    SnackBar(content: Text('Failed to fetch voucher detail!')),
+                                                    SnackBar(content: Text('Gagal mengambil detail voucher!')),
                                                   );
                                                 }
                                               },
@@ -333,7 +333,7 @@ class VoucherDetailDialog extends StatelessWidget {
                               } catch (e) {
                                 // Handle error
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('Failed to fetch user data: $e')),
+                                  SnackBar(content: Text('Failed to fetch user data')),
                                 );
                               }
                             },
@@ -363,7 +363,7 @@ class VoucherDetailDialog extends StatelessWidget {
                       const SizedBox(height: 12),
                       // Cost Section
                       Text(
-                        'Cost',
+                        'Biaya',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -382,7 +382,7 @@ class VoucherDetailDialog extends StatelessWidget {
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        'Description',
+                        'Deskripsi',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -420,9 +420,8 @@ class VoucherDetailDialog extends StatelessWidget {
                 },
                 );
               } catch (e) {
-                print('Error redeeming voucher'); // Debugging
                 ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Failed to redeem voucher!')),
+                SnackBar(content: Text('Gagal menukarkan voucher!')),
                 );
               }
               },
@@ -502,7 +501,7 @@ class RedeemDialog extends StatelessWidget {
                   const Icon(Icons.error_outline, color: Colors.red, size: 48),
                   const SizedBox(height: 16),
                   Text(
-                    'Failed to redeem voucher',
+                    'Gagal menukar voucher',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -518,7 +517,7 @@ class RedeemDialog extends StatelessWidget {
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    child: const Text('Close'),
+                    child: const Text('Tutup'),
                   ),
                 ],
               ),
@@ -535,7 +534,7 @@ class RedeemDialog extends StatelessWidget {
                 );
               } else if (detailSnapshot.hasError) {
                 return const Center(
-                  child: Text("Failed to load voucher details."),
+                  child: Text("Gagal memuat detail voucher."),
                 );
               } else if (detailSnapshot.hasData) {
                 final detailData = detailSnapshot.data;
@@ -618,7 +617,7 @@ class RedeemDialog extends StatelessWidget {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                detailData?['reward_name'] ?? 'Unknown Reward',
+                                detailData?['reward_name'] ?? 'Hadiah tidak diketahui',
                                 style: const TextStyle(
                                   fontSize: 15,
                                   fontFamily: 'Inter',
@@ -656,7 +655,7 @@ class RedeemDialog extends StatelessWidget {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                '${detailData?['description'] ?? 'Unknown Description'}',
+                                '${detailData?['description'] ?? 'Deskripsi tidak diketahui'}',
                                 style: const TextStyle(
                                   fontSize: 15,
                                   fontFamily: 'Inter',
@@ -695,14 +694,14 @@ class RedeemDialog extends StatelessWidget {
               }
 
               return const Center(
-                child: Text("Something went wrong"),
+                child: Text("Terjadi kesalahan"),
               );
             },
           );
         }
 
         return const Center(
-          child: Text("Something went wrong"),
+          child: Text("Terjadi kesalahan"),
         );
       },
     );

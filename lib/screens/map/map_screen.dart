@@ -53,7 +53,7 @@ class _MapScreenState extends State<MapScreen> {
 
       _searchNearbyFacilities();
     } catch (e) {
-      debugPrint('Error getting location: $e');
+      debugPrint('Kesalahan mendapatkan lokasi');
       if (mounted) {
         setState(() {
           isLoading = false;
@@ -128,10 +128,10 @@ class _MapScreenState extends State<MapScreen> {
           }
         });
       } else {
-        debugPrint('Failed to fetch nearby facilities: ${response.body}');
+        debugPrint('Gagal mengambil fasilitas terdekat');
       }
     } catch (e) {
-      debugPrint('Error searching facilities: $e');
+      debugPrint('Kesalahan mencari fasilitas');
     } finally {
       if (mounted) {
         setState(() {

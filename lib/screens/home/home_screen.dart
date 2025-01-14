@@ -96,7 +96,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                             Text(
-                              'Welcome Back',
+                              'Selamat datang kembali.',
                               style: TextStyle(
                               color: greenWithOpacity,
                               fontFamily: 'Inter',
@@ -213,7 +213,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   height: cardConstraints.maxHeight * 0.02,
                                 ),
                                 Text(
-                                  '$points Points',
+                                  '$points Poin',
                                   style: TextStyle(
                                   color: greenWithOpacity,
                                   fontFamily: 'Inter',
@@ -242,7 +242,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   height: cardConstraints.maxHeight * 0.04,
                                 ),
                                 Text(
-                                  '${1000 - (exp % 1000)} Exp left to next rank',
+                                  '${1000 - (exp % 1000)} Exp tersisa ke peringkat berikutnya',
                                   style: TextStyle(
                                   color: greenWithOpacity,
                                   fontFamily: 'Inter',
@@ -318,99 +318,100 @@ class _HomeScreenState extends State<HomeScreen> {
                               child: FutureBuilder<List<Map<String, dynamic>>>(
                               future: leaderboardFuture,
                               builder: (context, snapshot) {
-                                if (snapshot.connectionState == ConnectionState.waiting) {
-                                return const Center(child: CircularProgressIndicator(color: Color(0xFF00693E)));
-                                } else if (snapshot.hasError) {
-                                return Center(child: Text('Error: ${snapshot.error}'));
-                                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                                return const Center(child: Text('No data available'));
-                                } else {
-                                final leaderboardData = snapshot.data!
-                                  ..sort((a, b) => (b['exp'] as int).compareTo(a['exp'] as int));
+                              if (snapshot.connectionState == ConnectionState.waiting) {
+                              return const Center(child: CircularProgressIndicator(color: Color(0xFF00693E)));
+                              } else if (snapshot.hasError) {
+                              return Center(child: Text('Error: ${snapshot.error}'));
+                              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                              return const Center(child: Text('No data available'));
+                              } else {
+                              final leaderboardData = snapshot.data!
+                                ..sort((a, b) => (b['exp'] as int).compareTo(a['exp'] as int));
 
-                                return ListView.builder(
-                                  itemCount: leaderboardData.length,
-                                  itemBuilder: (context, index) {
-                                  final user = leaderboardData[index];
-                                  return Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-                                    child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                      '${index + 1}',
-                                      style: TextStyle(
-                                        color: greenColor,
-                                        fontFamily: 'Inter',
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 20,
-                                      ),
-                                      ),
-                                      const SizedBox(width: 20),
-                                      ClipOval(
-                                      child: user['profile_image'] != null
-                                        ? Image.network(
-                                            '$baseUrl/storage/${leaderboardData[index]['profile_image']}',
-                                          width: constraints.maxWidth * 0.15,
-                                          height: constraints.maxWidth * 0.15,
-                                          fit: BoxFit.cover,
-                                          errorBuilder: (context, error, stackTrace) {
-                                            return Image.asset(
-                                            'assets/images/placeholder_image.png',
-                                            width: constraints.maxWidth * 0.15,
-                                            height: constraints.maxWidth * 0.15,
-                                            fit: BoxFit.cover,
-                                            );
-                                          },
-                                          )
-                                        : Image.asset(
-                                          'assets/images/placeholder_image.png',
-                                          width: constraints.maxWidth * 0.15,
-                                          height: constraints.maxWidth * 0.15,
-                                          fit: BoxFit.cover,
-                                          ),
-                                      ),
-                                      const SizedBox(width: 20),
-                                      Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                        user['name'] ?? 'Unknown User',
-                                        style: TextStyle(
-                                          fontFamily: 'Inter',
-                                          fontWeight: FontWeight.bold,
-                                          color: greenColor,
-                                          fontSize: 16,
-                                        ),
-                                        ),
-                                        Text(
-                                        'EXP: ${user['exp']}',
-                                        style: TextStyle(
-                                          fontFamily: 'Inter',
-                                          fontWeight: FontWeight.bold,
-                                          color: greenWithOpacity,
-                                          fontSize: 14,
-                                        ),
-                                        ),
-                                      ],
-                                      ),
-                                      const Spacer(),
-                                      Text(
-                                      '${user['points']} points',
-                                      style: TextStyle(
-                                        fontFamily: 'Inter',
-                                        fontWeight: FontWeight.bold,
-                                        color: greenColor,
-                                        fontSize: 16,
-                                      ),
-                                      ),
-                                    ],
+                              return ListView.builder(
+                                itemCount: leaderboardData.length,
+                                itemBuilder: (context, index) {
+                                final user = leaderboardData[index];
+                                print("profile image : $baseUrl/storage/$user['profile_image']");
+                                return Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                                child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text(
+                                  '${index + 1}',
+                                  style: TextStyle(
+                                  color: greenColor,
+                                  fontFamily: 'Inter',
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                  ),
+                                  ),
+                                  const SizedBox(width: 20),
+                                  ClipOval(
+                                  child: user['profileImage'] != null
+                                  ? Image.network(
+                                    '$baseUrl/storage/${leaderboardData[index]['profileImage']}',
+                                    width: constraints.maxWidth * 0.15,
+                                    height: constraints.maxWidth * 0.15,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                    return Image.asset(
+                                    'assets/images/placeholder_image.png',
+                                    width: constraints.maxWidth * 0.15,
+                                    height: constraints.maxWidth * 0.15,
+                                    fit: BoxFit.cover,
+                                    );
+                                    },
+                                    )
+                                  : Image.asset(
+                                    'assets/images/placeholder_image.png',
+                                    width: constraints.maxWidth * 0.15,
+                                    height: constraints.maxWidth * 0.15,
+                                    fit: BoxFit.cover,
                                     ),
-                                  );
-                                  },
+                                  ),
+                                  const SizedBox(width: 20),
+                                  Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                  Text(
+                                  user['name'] ?? 'Pengguna Tidak Dikenal',
+                                  style: TextStyle(
+                                    fontFamily: 'Inter',
+                                    fontWeight: FontWeight.bold,
+                                    color: greenColor,
+                                    fontSize: 16,
+                                  ),
+                                  ),
+                                  Text(
+                                  'EXP: ${user['exp']}',
+                                  style: TextStyle(
+                                    fontFamily: 'Inter',
+                                    fontWeight: FontWeight.bold,
+                                    color: greenWithOpacity,
+                                    fontSize: 14,
+                                  ),
+                                  ),
+                                  ],
+                                  ),
+                                  const Spacer(),
+                                  Text(
+                                  '${user['points']} poin',
+                                  style: TextStyle(
+                                  fontFamily: 'Inter',
+                                  fontWeight: FontWeight.bold,
+                                  color: greenColor,
+                                  fontSize: 16,
+                                  ),
+                                  ),
+                                ],
+                                ),
                                 );
-                                }
+                                },
+                              );
+                              }
                               },
                               ),
                             ),

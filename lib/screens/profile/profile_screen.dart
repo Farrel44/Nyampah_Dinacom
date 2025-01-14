@@ -74,7 +74,7 @@ class _ProfilePageState extends State<ProfilePage> {
       }
     } catch (e) {
       // Handle error
-      print('Failed to refresh profile: $e');
+      print('Gagal memperbarui profil');
     } finally {
       if (mounted) {
         setState(() {
@@ -115,25 +115,40 @@ class _ProfilePageState extends State<ProfilePage> {
                           ClipOval(
                             child: user?['profile_image'] != null
                                 ? Image.network(
-                                  '$baseUrl/storage/${user?['profile_image']}',
-                                    width: constraints.maxWidth * 0.2,
-                                    height: constraints.maxWidth * 0.2,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return Image.asset(
-                                        'assets/images/placeholder_image.png',
-                                        width: constraints.maxWidth * 0.2,
-                                        height: constraints.maxWidth * 0.2,
-                                        fit: BoxFit.cover,
-                                      );
-                                    },
-                                  )
-                                : Image.asset(
-                                    'assets/images/placeholder_image.png',
-                                    width: constraints.maxWidth * 0.2,
-                                    height: constraints.maxWidth * 0.2,
-                                    fit: BoxFit.cover,
+                              '$baseUrl/storage/${user?['profile_image']}',
+                              width: constraints.maxWidth * 0.2,
+                              height: constraints.maxWidth * 0.2,
+                              fit: BoxFit.cover,
+                              loadingBuilder: (context, child, loadingProgress) {
+                                if (loadingProgress == null) return child;
+                                return Center(
+                                  child: SizedBox(
+                                    width: constraints.maxWidth * 0.1,
+                                    height: constraints.maxWidth * 0.1,
+                                    child: CircularProgressIndicator(
+                                      value: loadingProgress.expectedTotalBytes != null
+                                          ? loadingProgress.cumulativeBytesLoaded /
+                                          (loadingProgress.expectedTotalBytes ?? 1)
+                                          : null,
+                                    ),
                                   ),
+                                );
+                              },
+                              errorBuilder: (context, error, stackTrace) {
+                                return Image.asset(
+                                  'assets/images/placeholder_image.png',
+                                  width: constraints.maxWidth * 0.2,
+                                  height: constraints.maxWidth * 0.2,
+                                  fit: BoxFit.cover,
+                                );
+                              },
+                            )
+                                : Image.asset(
+                              'assets/images/placeholder_image.png',
+                              width: constraints.maxWidth * 0.2,
+                              height: constraints.maxWidth * 0.2,
+                              fit: BoxFit.cover,
+                            ),
                           ),
                           SizedBox(width: constraints.maxWidth * 0.05),
                           Column(

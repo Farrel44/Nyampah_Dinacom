@@ -14,7 +14,7 @@ class OnboardingScreen extends StatefulWidget {
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
   bool _isLoading = true;
-  String _loadingMessage = "Loading...";
+  String _loadingMessage = "Memuat....";
 
   @override
   void initState() {
@@ -28,7 +28,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
     if (isLogin) {
       setState(() {
-        _loadingMessage = "Logging you in...";
+        _loadingMessage = "Memasukkan Anda...";
       });
       Timer(const Duration(seconds: 1), () {
         Navigator.push(
@@ -272,7 +272,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         elevation: 0,
       ),
       child: Text(
-        'Get Started!',
+        'Mulai!',
         style: TextStyle(
           fontFamily: 'Inter',
           color: Colors.white,

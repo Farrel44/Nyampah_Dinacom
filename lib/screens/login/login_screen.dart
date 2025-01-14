@@ -46,7 +46,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Welcome To Nyampah!',
+                                'Selamat Datang di Sortify!',
                                 style: TextStyle(
                                   fontFamily: 'Inter',
                                   color: const Color(0xFF00693E),
@@ -55,7 +55,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                               ),
                               Text(
-                                'Please sign in first',
+                                'Silakan masuk terlebih dahulu',
                                 style: TextStyle(
                                   fontFamily: 'Inter',
                                   color: const Color(0xFF00693E),
@@ -77,7 +77,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             SizedBox(height: 20 * scale),
                             buildInputField(
                               context,
-                              label: 'Password',
+                              label: 'Kata sandi',
                               controller: passwordController,
                               isPassword: true,
                               passwordVisibility: passwordVisibility,
@@ -108,8 +108,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                     showDialog(
                                       context: context,
                                       builder: (context) => AlertDialog(
-                                        title: const Text('Error'),
-                                        content: const Text('Please fill in all fields'),
+                                        title: const Text('Terjadi Kesalahan'),
+                                        content: const Text('Harap isi semua kolom'),
                                         actions: [
                                           TextButton(
                                             onPressed: () => Navigator.pop(context),
@@ -129,7 +129,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       context: context,
                                       builder: (context) => AlertDialog(
                                         backgroundColor: const Color(0xFFF5F4ED),
-                                        title: const Text('Error'),
+                                        title: const Text('Terjadi Kesalahan'),
                                         content: const Text('Password harus minimal memiliki 8 karakter'),
                                         actions: [
                                           TextButton(
@@ -160,7 +160,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     await prefs.setBool('isLogin', true);
 
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text('Login successful!')),
+                                      const SnackBar(content: Text('Login berhasil!')),
                                     );
 
                                     Navigator.push(
@@ -172,7 +172,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       context: context,
                                       builder: (context) => AlertDialog(
                                         backgroundColor: const Color(0xFFF5F4ED),
-                                        title: const Text('Login Failed'),
+                                        title: const Text('Login Gagal!'),
                                         content: const Text('Email atau Password salah'),
                                         actions: [
                                             TextButton(
@@ -203,7 +203,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                 ),
                                 child: Text(
-                                  'Sign In',
+                                  'Masuk',
                                   style: TextStyle(
                                     fontFamily: 'Inter Tight',
                                     color: Colors.white,
@@ -217,7 +217,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              'Dont have an account?',
+                              'Tidak punya akun?',
                               style: TextStyle(
                                 fontFamily: 'Inter',
                                 color: const Color(0xFF00693E),
@@ -230,7 +230,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 MaterialPageRoute(builder: (context) => const SignUpScreen()));
                               },
                               child: Text(
-                                'Sign Up',
+                                'Daftar',
                                 style: TextStyle(
                                   fontFamily: 'Inter',
                                   color: const Color(0xFFFF8302),

@@ -74,9 +74,9 @@ class _ScanImageState extends State<ScanImage> with TickerProviderStateMixin {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
+            return Center(child: Text('Error!'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('No cameras available'));
+            return const Center(child: Text('Tidak ada kamera yang tersedia'));
           }
 
           final cameras = snapshot.data!;
@@ -359,7 +359,7 @@ class _ScanImageState extends State<ScanImage> with TickerProviderStateMixin {
                         },
                       );
                     } catch (e) {
-                      print('Error: $e');
+                      print('Error!');
                     } finally {
                       setState(() {
                         isLoading = false;

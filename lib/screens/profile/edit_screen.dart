@@ -32,7 +32,7 @@ class _EditProfileState extends State<EditProfile> {
         image = File(pickedImage.path);
       });
     } catch (e) {
-      debugPrint("Error picking image: $e");
+      debugPrint("Kesalahan dalam pemilihan gambar");
     }
   }
 
@@ -156,13 +156,13 @@ class _EditProfileState extends State<EditProfile> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _buildLabel('Username'),
+                          _buildLabel('Nama pengguna'),
                           _buildTextInput(
-                              usernameController, 'Update your username'),
+                              usernameController, 'Perbarui nama anda'),
                           SizedBox(height: size.height * 0.015),
-                          _buildLabel('Password'),
+                          _buildLabel('Kata sandi'),
                           _buildTextInput(
-                              passwordController, 'Update your password',
+                              passwordController, 'Perbarui password anda',
                               isObscure: true),
                           SizedBox(height: size.height * 0.010),
                         ],
@@ -183,7 +183,7 @@ class _EditProfileState extends State<EditProfile> {
                               });
                               try {
                                 if (token == null) {
-                                  throw Exception("Token is not available. Please log in again.");
+                                  throw Exception("Token tidak tersedia. Silakan masuk lagi.");
                                 }
 
                                 final String username = usernameController.text.trim();
@@ -206,7 +206,7 @@ class _EditProfileState extends State<EditProfile> {
 
                                 if (!hasUpdates) {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text("No changes to update.")),
+                                    const SnackBar(content: Text("Tidak ada perubahan untuk memperbarui.")),
                                   );
                                   return;
                                 }
@@ -234,7 +234,7 @@ class _EditProfileState extends State<EditProfile> {
                                 await loadUserData();
 
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text("Profile updated successfully!")),
+                                  const SnackBar(content: Text("Profil berhasil diperbarui!")),
                                 );
 
                                 if (!mounted) return;
@@ -242,7 +242,7 @@ class _EditProfileState extends State<EditProfile> {
 
                               } catch (e) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text("Error: $e")),
+                                  SnackBar(content: Text("Terjadi Kesalahan!")),
                                 );
                               } finally {
                                 // Fetch user data
@@ -254,12 +254,12 @@ class _EditProfileState extends State<EditProfile> {
                                     final userData = await UserService.getUserByName(token);
                                     await prefs.setString('user', jsonEncode(userData));
                                   } else {
-                                    throw Exception('Token not found');
+                                    throw Exception('Token tidak ditemukan');
                                   }
                                 } catch (e) {
                                   // Handle error
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text('Failed to fetch user data: $e')),
+                                    SnackBar(content: Text('Gagal mengambil data pengguna')),
                                   );
                                 }
                                 if (!mounted) return;
@@ -279,7 +279,7 @@ class _EditProfileState extends State<EditProfile> {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 Text(
-                                  "Submit",
+                                  "Kirim",
                                   style: TextStyle(
                                       fontFamily: 'Inter',
                                       fontSize: size.width * 0.035,

@@ -54,7 +54,7 @@ class _TrashHistoryState extends State<TrashHistory> {
         title: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8),
           child: Text(
-            "Trash Tracker",
+            "Lacak Sampah",
             style: TextStyle(
               color: greenColor,
               fontFamily: 'Inter',
@@ -80,20 +80,23 @@ class _TrashHistoryState extends State<TrashHistory> {
                       },
                       size: size,
                       basePadding: basePadding,
-                      title: "Daily",
+                      title: "Harian",
                       isSelected: selectedPeriod == 'day',
                     ),
                     SizedBox(width: size.width * 0.02),
-                    SelectButtonPeriod(
-                      onPressed: () {
-                        setState(() {
-                          selectedPeriod = 'week';
-                        });
-                      },
-                      size: size,
-                      basePadding: basePadding,
-                      title: "Weekly",
-                      isSelected: selectedPeriod == 'week',
+                    SizedBox(
+                      width: size.width * 0.3, // Adjust this value as needed
+                      child: SelectButtonPeriod(
+                        onPressed: () {
+                          setState(() {
+                            selectedPeriod = 'week';
+                          });
+                        },
+                        size: size,
+                        basePadding: basePadding,
+                        title: "Mingguan",
+                        isSelected: selectedPeriod == 'week',
+                      ),
                     ),
                     SizedBox(width: size.width * 0.02),
                     SelectButtonPeriod(
@@ -104,7 +107,7 @@ class _TrashHistoryState extends State<TrashHistory> {
                       },
                       size: size,
                       basePadding: basePadding,
-                      title: "Monthly",
+                      title: "Bulanan",
                       isSelected: selectedPeriod == 'month',
                     ),
                   ],
@@ -122,9 +125,9 @@ class _TrashHistoryState extends State<TrashHistory> {
                           color: Color(0xFF00693E),
                         ));
                       } else if (snapshot.hasError) {
-                        return Center(child: Text('Error: ${snapshot.error}'));
+                        return Center(child: Text('Error!'));
                       } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                        return const Center(child: Text('No data available.'));
+                        return const Center(child: Text('Tidak ada data yang tersedia.'));
                       }
 
                       final trashData = snapshot.data!;
@@ -192,7 +195,7 @@ class _TrashHistoryState extends State<TrashHistory> {
                                             children: [
                                             Text(
                                               trash['trash_name'] ??
-                                                'Unknown',
+                                                'Tidak diketahui',
                                               style:
                                                 const TextStyle(
                                               fontSize: 20,
@@ -379,7 +382,7 @@ class _TrashHistoryState extends State<TrashHistory> {
                                                   Expanded(
                                                     child: Text(
                                                       trash['trash_name'] ??
-                                                          'Unknown',
+                                                          'Tidak diketahui',
                                                       style: TextStyle(
                                                         fontSize:
                                                             size.width * 0.035,
@@ -400,7 +403,7 @@ class _TrashHistoryState extends State<TrashHistory> {
                                               const SizedBox(height: 4),
                                               Text(
                                                 trash['trash_category_name'] ??
-                                                    'Unknown',
+                                                    'Tidak diketahui',
                                                 style: TextStyle(
                                                   color: greenWithOpacity,
                                                   fontSize: size.width * 0.035,
@@ -416,7 +419,7 @@ class _TrashHistoryState extends State<TrashHistory> {
                                                         .toLocal()
                                                         .toString()
                                                         .split(' ')[0]
-                                                    : 'Unknown Date',
+                                                    : 'Tanggal Tidak Diketahui',
                                                 style: TextStyle(
                                                   color: greenColor,
                                                   fontFamily: 'Inter',

@@ -48,7 +48,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Welcome To Nyampah!',
+                                'Selamat datang di Sortify!',
                                 style: TextStyle(
                                   fontFamily: 'Inter',
                                   color: const Color(0xFF00693E),
@@ -57,7 +57,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 ),
                               ),
                               Text(
-                                'Please sign up first',
+                                'Silakan mendaftar akun terlebih dahulu',
                                 style: TextStyle(
                                   fontFamily: 'Inter',
                                   color: const Color(0xFF00693E),
@@ -72,7 +72,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           children: [
                             buildInputField(
                               context,
-                              label: 'Username',
+                              label: 'Nama pengguna',
                               controller: usernameController,
                               scale: scale,
                             ),
@@ -120,7 +120,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
                                           content:
-                                              Text('Please fill in all fields')),
+                                              Text('Harap isi semua kolom!')),
                                     );
                                     setState(() {
                                       _isLoading = false;
@@ -134,8 +134,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
                                         content: Text(
-                                          'Password must be at least 8 characters long, include 1 lowercase letter, '
-                                          '1 uppercase letter, and 1 number.',
+                                          'Kata sandi harus terdiri dari minimal 8 karakter, termasuk 1 huruf kecil, '
+                                          '1 huruf besar, dan 1 angka.',
                                         ),
                                       ),
                                     );
@@ -162,7 +162,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
                                           content: Text(
-                                              'Registration successful!')),
+                                              'Pendaftaran berhasil!')),
                                     );
 
                                     Navigator.push(
@@ -175,7 +175,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                           content: Text(
-                                              'Registration failed: $error')),
+                                              'Pendaftaran gagal!')),
                                     );
                                   } finally {
                                     setState(() {
@@ -196,7 +196,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   ),
                                 ),
                                 child: Text(
-                                  'Sign Up',
+                                  'Daftar',
                                   style: TextStyle(
                                     fontFamily: 'Inter Tight',
                                     color: Colors.white,
@@ -210,7 +210,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              'Already have an account?',
+                              'Sudah mempunyai akun? ',
                               style: TextStyle(
                                 fontFamily: 'Inter',
                                 color: const Color(0xFF00693E),
@@ -227,7 +227,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 );
                               },
                               child: Text(
-                                'Sign In',
+                                'Masuk',
                                 style: TextStyle(
                                   fontFamily: 'Inter',
                                   color: const Color(0xFFFF8302),
