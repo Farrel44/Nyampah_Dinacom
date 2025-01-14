@@ -7,6 +7,7 @@ import 'package:nyampah_app/services/user_service.dart';
 import 'package:nyampah_app/theme/colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import 'package:nyampah_app/screens/map/map_screen.dart';
 import 'package:nyampah_app/main.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -205,7 +206,7 @@ class _ProfilePageState extends State<ProfilePage> {
               SizedBox(height: basePadding),
               Container(
                 width: size.width,
-                height: size.height * 0.15,
+                height: size.height * 0.17,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(8),
@@ -309,7 +310,59 @@ class _ProfilePageState extends State<ProfilePage> {
                                 ),
                                 )
                             ],
+                          ),
+                          Divider(
+                            height: constraints.maxWidth * 0.05,
+                            color: greenWithOpacity,
+                          ),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              SvgPicture.asset(
+                                'assets/images/map_icon.svg',
+                                width: constraints.maxWidth * 0.07,
+                              ),
+                              SizedBox(width: constraints.maxWidth * 0.03),
+                              const Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Tempat Pengolahan Sampah',
+                                    style: TextStyle(
+                                        fontFamily: 'Inter',
+                                        fontWeight: FontWeight.bold,
+                                        color: greenColor,
+                                        fontSize: 13),
+                                  ),
+                                  Text(
+                                    'Yuk cari tahu tempat pengolahan sampah terdekat!',
+                                    style: TextStyle(
+                                        fontFamily: 'Inter',
+                                        color: greenWithOpacity,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 10),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(width: constraints.maxWidth * 0.03),
+                              GestureDetector(
+                                onTap: () async {
+                                  await Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const MapScreen(),
+                                        ),
+                                      ); 
+                                },
+                                child: const Icon(
+                                  Icons.chevron_right,
+                                  color: greenWithOpacity,
+                                ),
+                                )
+                            ],
                           )
+                          
                         ],
                       ),
                     );

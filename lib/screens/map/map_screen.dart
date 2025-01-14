@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:nyampah_app/theme/colors.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
@@ -26,13 +28,15 @@ class _MapScreenState extends State<MapScreen> {
   Future<void> _getCurrentLocation() async {
     try {
       LocationPermission permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
+      if (permission == LocationPermission.denied || !mounted) {
         return;
       }
 
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high
       );
+
+      if (!mounted) return;
 
       setState(() {
         _currentPosition = position;
@@ -50,64 +54,91 @@ class _MapScreenState extends State<MapScreen> {
       _searchNearbyFacilities();
     } catch (e) {
       debugPrint('Error getting location: $e');
-      setState(() {
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
   }
 
   Future<void> _searchNearbyFacilities() async {
-    if (_currentPosition == null) return;
-
-    // Example facility locations - replace with real API data
-    final facilities = [
-      {
-        'name': 'TPA Purwokerto',
-        'lat': _currentPosition!.latitude + 0.01,
-        'lng': _currentPosition!.longitude,
-        'type': '(TPA) Tempat Pembuangan Akhir',
-      },
-      {
-        'name': 'Bank Sampah Purwokerto',
-        'lat': _currentPosition!.latitude,
-        'lng': _currentPosition!.longitude + 0.01,
-        'type': 'Bank Sampah',
-      },
-      // Add more sample facilities
-    ];
+    if (_currentPosition == null || !mounted) return;
 
     setState(() {
-      _markers.clear();
-      // Add current location marker
-      _markers.add(
-        Marker(
-          markerId: const MarkerId('current_location'),
-          position: LatLng(_currentPosition!.latitude, _currentPosition!.longitude),
-          infoWindow: const InfoWindow(title: 'Lokasi Anda'),
-          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
-        ),
-      );
+      isLoading = true;
+    });
 
-      // Add facility markers that match the selected type
-      for (var facility in facilities) {
-        if (facility['type'] == selectedType) {
+    const String apiKey = 'AIzaSyCxjdt6ro3m_2Z4TASj6sbPk8GUWQcVKtI';
+    
+    // Use the selectedType directly as the search keyword
+    String searchKeyword = selectedType
+        .replaceAll('(TPA)', '')
+        .replaceAll('(TPST)', '')
+        .replaceAll('(MRF)', '')
+        .replaceAll('(B3)', '')
+        .trim();
+
+    final String url =
+        'https://maps.googleapis.com/maps/api/place/nearbysearch/json'
+        '?location=${_currentPosition!.latitude},${_currentPosition!.longitude}'
+        '&radius=5000'
+        '&keyword=${Uri.encodeComponent(searchKeyword)}'
+        '&key=$apiKey';
+
+    try {
+      final response = await http.get(Uri.parse(url));
+      if (!mounted) return;
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        if (!mounted) return;
+
+        // Parsing data lokasi dari API
+        setState(() {
+          _markers.clear();
+
+          // Tambahkan marker untuk lokasi pengguna
           _markers.add(
             Marker(
-              markerId: MarkerId(facility['name'] as String),
-              position: LatLng(
-                facility['lat'] as double,
-                facility['lng'] as double,
-              ),
-              infoWindow: InfoWindow(
-                title: facility['name'] as String,
-                snippet: facility['type'] as String,
-              ),
-              icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+              markerId: const MarkerId('current_location'),
+              position: LatLng(_currentPosition!.latitude, _currentPosition!.longitude),
+              infoWindow: const InfoWindow(title: 'Lokasi Anda'),
+              icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
             ),
           );
-        }
+
+          // Tambahkan marker untuk setiap fasilitas yang ditemukan
+          for (var place in data['results']) {
+            _markers.add(
+              Marker(
+                markerId: MarkerId(place['place_id']),
+                position: LatLng(
+                  place['geometry']['location']['lat'],
+                  place['geometry']['location']['lng'],
+                ),
+                infoWindow: InfoWindow(
+                  title: place['name'],
+                  snippet: place['vicinity'],
+                ),
+                icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+              ),
+            );
+          }
+        });
+      } else {
+        debugPrint('Failed to fetch nearby facilities: ${response.body}');
       }
-    });
+    } catch (e) {
+      debugPrint('Error searching facilities: $e');
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
   }
 
   @override

@@ -322,12 +322,12 @@ class _ScanImageState extends State<ScanImage> with TickerProviderStateMixin {
                                           SizedBox(height: 20),
                                           ElevatedButton(
                                           onPressed: () async{
-                                            await Navigator.of(context).push(
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                 MapScreen(),
-                                        ),
-                                      );
+                                                await Navigator.of(context).push(
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                    MapScreen(),
+                                            ),
+                                          );
                                           },
                                           style: ElevatedButton.styleFrom(
                                             backgroundColor: leaderBoardTitleColor,
