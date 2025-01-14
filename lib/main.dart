@@ -7,9 +7,10 @@ import 'package:nyampah_app/screens/trash_tracking/trash_tracker_screen.dart';
 import 'package:nyampah_app/screens/voucher/voucher_screen.dart';
 import 'package:nyampah_app/screens/onboarding/onboarding_screen.dart';
 import 'package:nyampah_app/theme/navbar.dart';
+import 'package:nyampah_app/screens/map/map_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
-import 'package:nyampah_app/services/user_service.dart'; // Assuming you have a UserService to fetch user data
+import 'package:nyampah_app/services/user_service.dart';
 
 late List<CameraDescription> _cameras;
 
@@ -30,7 +31,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: const OnboardingScreen(),
+      home: MainNavigator(),
     );
   }
 }
@@ -60,6 +61,7 @@ class _MainNavigatorState extends State<MainNavigator> {
     const ScanImage(),
     const ProfilePage(),
     const TrashHistory(),
+    MapScreen(),
   ];
 
   @override

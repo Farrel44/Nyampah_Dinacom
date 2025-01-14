@@ -1,7 +1,7 @@
-import 'dart:math';
 import 'package:nyampah_app/main.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:nyampah_app/screens/map/map_screen.dart';
 import 'package:nyampah_app/theme/colors.dart';
 import 'package:nyampah_app/services/scan_service.dart';
 import 'dart:io';
@@ -289,39 +289,66 @@ class _ScanImageState extends State<ScanImage> with TickerProviderStateMixin {
                                     SizedBox(height: size.height * 0.03),
                                     Expanded(
                                       child: TabBarView(
-                                        controller: _tabController,
+                                      controller: _tabController,
+                                      children: [
+                                        ListView(
+                                        controller: scrollController,
                                         children: [
-                                          ListView(
-                                            controller: scrollController,
-                                            children: [
-                                              Text(
-                                                description,
-                                                textAlign: TextAlign.justify,
-                                                style: TextStyle(
-                                                  fontFamily: 'Inter',
-                                                  fontSize: basePadding * 0.9,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: greenColor,
-                                                ),
-                                              ),
-                                            ],
+                                          Text(
+                                          description,
+                                          textAlign: TextAlign.justify,
+                                          style: TextStyle(
+                                            fontFamily: 'Inter',
+                                            fontSize: basePadding * 0.9,
+                                            fontWeight: FontWeight.bold,
+                                            color: greenColor,
                                           ),
-                                          ListView(
-                                            controller: scrollController,
-                                            children: [
-                                              Text(
-                                                pengelolaan,
-                                                textAlign: TextAlign.justify,
-                                                style: TextStyle(
-                                                  fontFamily: 'Inter',
-                                                  fontSize: basePadding * 0.9,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: greenColor,
-                                                ),
-                                              ),
-                                            ],
                                           ),
                                         ],
+                                        ),
+                                        ListView(
+                                        controller: scrollController,
+                                        children: [
+                                          Text(
+                                          pengelolaan,
+                                          textAlign: TextAlign.justify,
+                                          style: TextStyle(
+                                            fontFamily: 'Inter',
+                                            fontSize: basePadding * 0.9,
+                                            fontWeight: FontWeight.bold,
+                                            color: greenColor,
+                                          ),
+                                          ),
+                                          SizedBox(height: 20),
+                                          ElevatedButton(
+                                          onPressed: () async{
+                                            await Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                 MapScreen(),
+                                        ),
+                                      );
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: leaderBoardTitleColor,
+                                            iconColor: leaderBoardTitleColor,
+                                            shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(10),
+                                            ),
+                                          ),
+                                          child: Text(
+                                            'Tempat Pengelolaan',
+                                            style: TextStyle(
+                                            fontFamily: 'Inter',
+                                            fontSize: basePadding * 0.9,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                            ),
+                                          ),
+                                          ),
+                                        ],
+                                        ),
+                                      ],
                                       ),
                                     ),
                                   ],
