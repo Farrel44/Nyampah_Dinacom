@@ -102,6 +102,48 @@ class _ScanImageState extends State<ScanImage> with TickerProviderStateMixin {
                   ),
                 ),
               ),
+              // Top Left Button
+              Positioned(
+                top: size.height * 0.05,
+                left: size.width * 0.05,
+                child: Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Color(0xFFE1EBE7),
+                  ),
+                  child: IconButton(
+                    onPressed: () {
+                      // Add functionality here (e.g., go back or open a menu)
+                    },
+                    icon: Icon(Icons.arrow_back, color: const Color.fromRGBO(0, 105, 62, 100)),
+                    tooltip: 'Back',
+                  ),
+                ),
+              ),
+              // Top Right Button
+              Positioned(
+                top: size.height * 0.05,
+                right: size.width * 0.05,
+                child: Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Color(0xFFE1EBE7),
+                  ),
+                  child: IconButton(
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        barrierDismissible: false, // Prevent dismissal by tapping outside
+                        builder: (context) {
+                          return TutorialDialog();
+                        },
+                      );
+                    },
+                    icon: Icon(Icons.question_mark_outlined, color: const Color.fromRGBO(0, 105, 62, 100)),
+                    tooltip: 'Settings',
+                  ),
+                ),
+              ),
               Positioned(
                 bottom: size.height * 0.2,
                 left: MediaQuery.of(context).size.width * 0.5 - 30,
@@ -196,7 +238,11 @@ class _ScanImageState extends State<ScanImage> with TickerProviderStateMixin {
                                               // Add functionality here
                                             },
                                             style: ElevatedButton.styleFrom(
-                                              backgroundColor: leaderBoardTitleColor, // Use your custom color
+                                              backgroundColor: category == 'Limbah' || category == 'Limbah B3'
+                                                  ? Colors.red
+                                                  : category == 'Organik'
+                                                      ? Colors.green
+                                                      : leaderBoardTitleColor, // Use your custom color
                                               shape: RoundedRectangleBorder(
                                                 borderRadius: BorderRadius.circular(10), // Rounded corners
                                               ),
@@ -303,6 +349,106 @@ class _ScanImageState extends State<ScanImage> with TickerProviderStateMixin {
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+class TutorialDialog extends StatefulWidget {
+  const TutorialDialog({super.key});
+
+  @override
+  _TutorialDialogState createState() => _TutorialDialogState();
+}
+
+class _TutorialDialogState extends State<TutorialDialog> {
+  final PageController _pageController = PageController();
+  int currentStep = 0;
+
+  final List<String> steps = [
+    "Arahkan kamera handphone kamu ke sampah yang kamu tuju!",
+    "Kalau ada lebih dari 1 sampah yang bentuknya sama, mending discan barengan aja!",
+    "Scan sampahnya, dapetin poinnya, dan tuker jadi beragam voucher yang menarik!",
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: SizedBox(
+        height: 350,
+        child: Column(
+          children: [
+            // Close Button
+            Align(
+              alignment: Alignment.topRight,
+              child: IconButton(
+                icon: Icon(Icons.close_rounded, color: Color(0xFF00693E)),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ),
+            // Content with PageView
+            Expanded(
+              child: PageView.builder(
+                controller: _pageController,
+                onPageChanged: (index) {
+                  setState(() {
+                    currentStep = index;
+                  });
+                },
+                itemCount: steps.length,
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Expanded(
+                            child: Image.asset(
+                            'assets/images/tutorial_step_${index + 1}.png',
+                            fit: BoxFit.contain
+                            ),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          steps[index],
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                          fontSize: 16,
+                          color: Color(0xFF00693E),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 16),
+            // Navigation Dots
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(steps.length, (index) {
+                return Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 4.0),
+                  width: 8,
+                  height: 8,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: currentStep == index
+                        ? Color(0xFF00693E)
+                        : Colors.grey.withOpacity(0.5),
+                  ),
+                );
+              }),
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
       ),
     );
   }

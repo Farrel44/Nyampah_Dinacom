@@ -131,22 +131,43 @@ class UserService {
 
 
   static Future<Map<String, dynamic>> updateProfileImage(String token, File imageFile) async {
-  final url = Uri.parse('$baseUrl/api/v1/update-profile-image');
+    final url = Uri.parse('$baseUrl/api/v1/update-profile-image');
 
-  final request = http.MultipartRequest('POST', url)
-    ..headers['Accept'] = 'application/json'
-    ..headers['Authorization'] = 'Bearer $token'
-    ..files.add(await http.MultipartFile.fromPath('profile_image', imageFile.path));
+    final request = http.MultipartRequest('POST', url)
+      ..headers['Accept'] = 'application/json'
+      ..headers['Authorization'] = 'Bearer $token'
+      ..files.add(await http.MultipartFile.fromPath('profile_image', imageFile.path));
 
-  final response = await request.send();
+    final response = await request.send();
 
-  if (response.statusCode == 200) {
-    final responseData = await response.stream.bytesToString();
-    return jsonDecode(responseData);
-  } else {
-    final errorResponse = await response.stream.bytesToString();
-    throw Exception('Failed to update profile image: $errorResponse');
+    if (response.statusCode == 200) {
+      final responseData = await response.stream.bytesToString();
+      return jsonDecode(responseData);
+    } else {
+      final errorResponse = await response.stream.bytesToString();
+      throw Exception('Failed to update profile image: $errorResponse');
+    }
   }
-}
+
+  static Future<Map<String, dynamic>> getUserByName(String token) async {
+    final url = Uri.parse('$baseUrl/api/v1/user-data');
+
+    final response = await http.get(
+      url,
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> responseData = jsonDecode(response.body);
+      return responseData['data']['data'];
+    } else {
+      throw Exception('Failed to fetch user data: ${response.body}');
+    }
+  }
+
+
 
 }

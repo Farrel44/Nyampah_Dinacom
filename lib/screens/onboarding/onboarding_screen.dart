@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:nyampah_app/main.dart';
 import 'package:nyampah_app/screens/signup/signup_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
-import 'package:nyampah_app/screens/home/home_screen.dart';
-import 'package:nyampah_app/screens/login/login_screen.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({Key? key}) : super(key: key);
@@ -14,6 +13,9 @@ class OnboardingScreen extends StatefulWidget {
 }
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
+  bool _isLoading = true;
+  String _loadingMessage = "Loading...";
+
   @override
   void initState() {
     super.initState();
@@ -25,18 +27,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     bool? isLogin = sp.getBool('isLogin') ?? false;
 
     if (isLogin) {
-      Timer(const Duration(seconds: 5), () {
+      setState(() {
+        _loadingMessage = "Logging you in...";
+      });
+      Timer(const Duration(seconds: 1), () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
+          MaterialPageRoute(builder: (context) => MainNavigator()),
         );
       });
     } else {
-      Timer(const Duration(seconds: 5), () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const LoginScreen()),
-        );
+      setState(() {
+        _isLoading = false;
       });
     }
   }
@@ -45,110 +47,121 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F4ED),
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          final width = constraints.maxWidth;
-          final height = constraints.maxHeight;
+      body: _isLoading
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(color: const Color(0xFF00693E)),
+                  SizedBox(height: 20),
+                  Text(_loadingMessage),
+                ],
+              ),
+            )
+          : LayoutBuilder(
+              builder: (context, constraints) {
+                final width = constraints.maxWidth;
+                final height = constraints.maxHeight;
 
-          return Stack(
-            children: [
-              _buildSvgAsset(
-                alignment: const AlignmentDirectional(-0.6, 1),
-                asset: 'assets/images/leaf_3.svg',
-                width: width * 0.18,
-                height: height * 0.18,
-              ),
-              _buildSvgAsset(
-                alignment: const AlignmentDirectional(0.60, 0.23),
-                asset: 'assets/images/bottle.svg',
-                width: width * 0.29,
-                height: height * 0.29,
-              ),
-              _buildSvgAsset(
-                alignment: const AlignmentDirectional(1.6, 1),
-                asset: 'assets/images/recycle_bin.svg',
-                width: width * 0.7,
-                height: height * 0.7,
-              ),
-              Align(
-                alignment: const AlignmentDirectional(0, -1),
-                child: Padding(
-                  padding: EdgeInsets.fromLTRB(
-                    width * 0.05,
-                    height * 0.05,
-                    width * 0.19,
-                    0,
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildTextSection(),
-                      SizedBox(height: height * 0.02),
-                      _buildGetStartedButton(context, width, height),
-                    ],
-                  ),
-                ),
-              ),
-              _buildSvgAsset(
-                alignment: const AlignmentDirectional(-1, -0.2),
-                asset: 'assets/images/leaf_2.svg',
-                width: width * 0.2,
-                height: height * 0.2,
-              ),
-              _buildSvgAsset(
-                alignment: const AlignmentDirectional(1, -1),
-                asset: 'assets/images/leaf_1.svg',
-                width: width * 0.3,
-                height: width * 0.3,
-                fit: BoxFit.cover,
-              ),
-              _buildSvgAsset(
-                alignment: const AlignmentDirectional(0.4, -0.54),
-                asset: 'assets/images/leaf_4.svg',
-                width: width * 0.04,
-                height: height * 0.04,
-              ),
-              _buildSvgAsset(
-                alignment: const AlignmentDirectional(-0.7, 0.16),
-                asset: 'assets/images/leaf_5.svg',
-                width: width * 0.04,
-                height: height * 0.04,
-              ),
-              _buildSvgAsset(
-                alignment: const AlignmentDirectional(-1, 0.65),
-                asset: 'assets/images/deco.svg',
-                width: width * 0.1,
-                height: height * 0.1,
-              ),
-              _buildSvgAsset(
-                alignment: const AlignmentDirectional(-0.63, -1.1),
-                asset: 'assets/images/deco_2.svg',
-                width: width * 0.04,
-                height: height * 0.04,
-              ),
-              _buildSvgAsset(
-                alignment: const AlignmentDirectional(0.94, -0.34),
-                asset: 'assets/images/deco.svg',
-                width: width * 0.1,
-                height: height * 0.1,
-              ),
-              _buildSvgAsset(
-                alignment: const AlignmentDirectional(-0.3, -0.1),
-                asset: 'assets/images/trash.svg',
-                width: width * 0.07,
-                height: height * 0.07,
-              ),
-              _buildSvgAsset(
-                alignment: const AlignmentDirectional(0.10, -0.4),
-                asset: 'assets/images/can.svg',
-                width: width * 0.08,
-                height: height * 0.08,
-              ),
-            ],
-          );
-        },
-      ),
+                return Stack(
+                  children: [
+                    _buildSvgAsset(
+                      alignment: const AlignmentDirectional(-0.6, 1),
+                      asset: 'assets/images/leaf_3.svg',
+                      width: width * 0.18,
+                      height: height * 0.18,
+                    ),
+                    _buildSvgAsset(
+                      alignment: const AlignmentDirectional(0.60, 0.23),
+                      asset: 'assets/images/bottle.svg',
+                      width: width * 0.29,
+                      height: height * 0.29,
+                    ),
+                    _buildSvgAsset(
+                      alignment: const AlignmentDirectional(1.6, 1),
+                      asset: 'assets/images/recycle_bin.svg',
+                      width: width * 0.7,
+                      height: height * 0.7,
+                    ),
+                    Align(
+                      alignment: const AlignmentDirectional(0, -1),
+                      child: Padding(
+                        padding: EdgeInsets.fromLTRB(
+                          width * 0.05,
+                          height * 0.05,
+                          width * 0.19,
+                          0,
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildTextSection(),
+                            SizedBox(height: height * 0.02),
+                            _buildGetStartedButton(context, width, height),
+                          ],
+                        ),
+                      ),
+                    ),
+                    _buildSvgAsset(
+                      alignment: const AlignmentDirectional(-1, -0.2),
+                      asset: 'assets/images/leaf_2.svg',
+                      width: width * 0.2,
+                      height: height * 0.2,
+                    ),
+                    _buildSvgAsset(
+                      alignment: const AlignmentDirectional(1, -1),
+                      asset: 'assets/images/leaf_1.svg',
+                      width: width * 0.3,
+                      height: width * 0.3,
+                      fit: BoxFit.cover,
+                    ),
+                    _buildSvgAsset(
+                      alignment: const AlignmentDirectional(0.4, -0.54),
+                      asset: 'assets/images/leaf_4.svg',
+                      width: width * 0.04,
+                      height: height * 0.04,
+                    ),
+                    _buildSvgAsset(
+                      alignment: const AlignmentDirectional(-0.7, 0.16),
+                      asset: 'assets/images/leaf_5.svg',
+                      width: width * 0.04,
+                      height: height * 0.04,
+                    ),
+                    _buildSvgAsset(
+                      alignment: const AlignmentDirectional(-1, 0.65),
+                      asset: 'assets/images/deco.svg',
+                      width: width * 0.1,
+                      height: height * 0.1,
+                    ),
+                    _buildSvgAsset(
+                      alignment: const AlignmentDirectional(-0.63, -1.1),
+                      asset: 'assets/images/deco_2.svg',
+                      width: width * 0.04,
+                      height: height * 0.04,
+                    ),
+                    _buildSvgAsset(
+                      alignment: const AlignmentDirectional(0.94, -0.34),
+                      asset: 'assets/images/deco.svg',
+                      width: width * 0.1,
+                      height: height * 0.1,
+                    ),
+                    _buildSvgAsset(
+                      alignment: const AlignmentDirectional(-0.3, -0.1),
+                      asset: 'assets/images/trash.svg',
+                      width: width * 0.07,
+                      height: height * 0.07,
+                    ),
+                    _buildSvgAsset(
+                      alignment: const AlignmentDirectional(0.10, -0.4),
+                      asset: 'assets/images/can.svg',
+                      width: width * 0.08,
+                      height: height * 0.08,
+                    ),
+                  ],
+                );
+              },
+            ),
     );
   }
 

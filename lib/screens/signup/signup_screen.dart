@@ -169,7 +169,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) =>
-                                              const MainNavigator()),
+                                               MainNavigator()),
                                     );
                                   } catch (error) {
                                     ScaffoldMessenger.of(context).showSnackBar(

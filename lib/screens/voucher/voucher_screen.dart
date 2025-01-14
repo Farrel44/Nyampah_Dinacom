@@ -1,12 +1,11 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:nyampah_app/theme/colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 import 'package:nyampah_app/services/voucher_service.dart';
+import 'package:nyampah_app/services/user_service.dart';
 
 class VoucherPage extends StatefulWidget {
   const VoucherPage({super.key});
@@ -74,6 +73,7 @@ class VoucherPageState extends State<VoucherPage> {
     return Scaffold(
       extendBody: true,
       backgroundColor: backgroundColor,
+      //app bar poin
       appBar: AppBar(
         actions: [
             Padding(
@@ -317,8 +317,25 @@ class VoucherDetailDialog extends StatelessWidget {
                           ),
                           IconButton(
                             icon: Icon(Icons.close, color: greenColor),
-                            onPressed: () {
+                            onPressed: () async {
                               Navigator.of(context).pop();
+                              // Fetch user data
+                              try {
+                                final prefs = await SharedPreferences.getInstance();
+                                final token = prefs.getString('token');
+
+                                if (token != null) {
+                                  final userData = await UserService.getUserByName(token);
+                                  await prefs.setString('user', jsonEncode(userData));
+                                } else {
+                                  throw Exception('Token not found');
+                                }
+                              } catch (e) {
+                                // Handle error
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('Failed to fetch user data: $e')),
+                                );
+                              }
                             },
                           ),
                         ],

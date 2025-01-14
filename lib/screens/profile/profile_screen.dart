@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:nyampah_app/screens/home/edit_screen.dart';
+import 'package:nyampah_app/screens/achievement/achievement_screen.dart';
+import 'package:nyampah_app/screens/profile/edit_screen.dart';
 import 'package:nyampah_app/screens/login/login_screen.dart';
+import 'package:nyampah_app/services/user_service.dart';
 import 'package:nyampah_app/theme/colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
@@ -17,6 +19,7 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   Map<String, dynamic>? user;
   String? token;
+  bool isRefreshing = false;
 
   @override
   void initState() {
@@ -32,15 +35,52 @@ class _ProfilePageState extends State<ProfilePage> {
     final userToken = prefs.getString('token');
 
     if (userData != null) {
-      setState(() {
-        user = jsonDecode(userData);
-        token = userToken;
-      });
+      if (mounted) {
+        setState(() {
+          user = jsonDecode(userData);
+          token = userToken;
+        });
+      }
     }
   }
 
   Future<void> reloadUserData() async {
     await loadUserData();
+  }
+
+  Future<void> refreshProfile() async {
+    if (!mounted) return;
+    
+    setState(() {
+      isRefreshing = true;
+    });
+
+    try {
+      // Get fresh data from API
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+      
+      if (token != null) {
+        final userData = await UserService.getUserByName(token);
+        if (userData != null) {
+          prefs.setString('user', jsonEncode(userData));
+          if (mounted) {
+            setState(() {
+              user = userData;
+            });
+          }
+        }
+      }
+    } catch (e) {
+      // Handle error
+      print('Failed to refresh profile: $e');
+    } finally {
+      if (mounted) {
+        setState(() {
+          isRefreshing = false;
+        });
+      }
+    }
   }
 
   @override
@@ -74,7 +114,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           ClipOval(
                             child: user?['profile_image'] != null
                                 ? Image.network(
-                                    '$baseUrl/storage/profile_images/${user?['profile_image']}',
+                                  '$baseUrl/storage/${user?['profile_image']}',
                                     width: constraints.maxWidth * 0.2,
                                     height: constraints.maxWidth * 0.2,
                                     fit: BoxFit.cover,
@@ -126,13 +166,15 @@ class _ProfilePageState extends State<ProfilePage> {
                                 children: [
                                   GestureDetector(
                                     onTap: () async {
-                                      await Navigator.of(context).push(
+                                      final result = await Navigator.of(context).push(
                                         MaterialPageRoute(
                                           builder: (context) =>
                                               const EditProfile(),
                                         ),
                                       );
-                                      reloadUserData();
+                                      if (result == true) {
+                                        await refreshProfile(); // Use the new refresh function
+                                      }
                                     },
                                     child: Text(
                                       "Edit Profil",
@@ -177,9 +219,10 @@ class _ProfilePageState extends State<ProfilePage> {
                         children: [
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
                               SvgPicture.asset(
-                                'assets/images/setting.svg',
+                                'assets/images/achievement_icon.svg',
                                 width: constraints.maxWidth * 0.07,
                               ),
                               SizedBox(width: constraints.maxWidth * 0.03),
@@ -187,7 +230,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Voucherku',
+                                    'Peringkat dan Pencapaian',
                                     style: TextStyle(
                                         fontFamily: 'Inter',
                                         fontWeight: FontWeight.bold,
@@ -205,10 +248,20 @@ class _ProfilePageState extends State<ProfilePage> {
                                 ],
                               ),
                               SizedBox(width: constraints.maxWidth * 0.25),
-                              const Icon(
-                                Icons.chevron_right,
-                                color: greenWithOpacity,
-                              )
+                                GestureDetector(
+                                onTap: () async {
+                                  await Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const AchievementPage(),
+                                        ),
+                                      );
+                                },
+                                child: const Icon(
+                                  Icons.chevron_right,
+                                  color: greenWithOpacity,
+                                ),
+                                )
                             ],
                           ),
                           Divider(
@@ -217,9 +270,10 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
                               SvgPicture.asset(
-                                'assets/images/setting.svg',
+                                'assets/images/trash_icon.svg',
                                 width: constraints.maxWidth * 0.07,
                               ),
                               SizedBox(width: constraints.maxWidth * 0.03),
@@ -245,10 +299,15 @@ class _ProfilePageState extends State<ProfilePage> {
                                 ],
                               ),
                               SizedBox(width: constraints.maxWidth * 0.12),
-                              const Icon(
-                                Icons.chevron_right,
-                                color: greenWithOpacity,
-                              ),
+                              GestureDetector(
+                                onTap: () async {
+                                  MainNavigator.navigatorKey.currentState?.navigateToPage(4);
+                                },
+                                child: const Icon(
+                                  Icons.chevron_right,
+                                  color: greenWithOpacity,
+                                ),
+                                )
                             ],
                           )
                         ],
@@ -258,33 +317,85 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
               SizedBox(height: size.height * 0.4),
-              SizedBox(
+                SizedBox(
                 width: size.width,
                 height: size.height * 0.06,
                 child: ElevatedButton(
                   onPressed: () async {
+                  bool? confirmLogout = await showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                    return AlertDialog(
+                      backgroundColor: backgroundColor,
+                      title: Text(
+                      'Konfirmasi Keluar',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: greenColor,
+                      ),
+                      ),
+                      content: Text(
+                      'Apakah Anda yakin ingin keluar?',
+                      style: TextStyle(
+                        color: Colors.black,
+                      ),
+                      ),
+                      actions: [
+                      TextButton(
+                        onPressed: () {
+                        Navigator.of(context).pop(false);
+                        },
+                        child: Text(
+                        'Batal',
+                        style: TextStyle(
+                          color: greenColor,
+                        ),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                        Navigator.of(context).pop(true);
+                        },
+                        child: Text(
+                        'Keluar',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: darkRed,
+                        ),
+                        ),
+                      ),
+                      ],
+                    );
+                    },
+                  );
+
+                  if (confirmLogout == true) {
                     SharedPreferences sp = await SharedPreferences.getInstance();
                     sp.clear();
-                    
-                    Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => const LoginScreen()));
+
+                    Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => const LoginScreen()),
+                    (Route<dynamic> route) => false,
+                    );
+                  }
                   },
                   child: Text(
-                    'Keluar',
-                    style: TextStyle(
-                        fontFamily: 'Inter',
-                        fontSize: size.width * 0.045,
-                        fontWeight: FontWeight.bold),
+                  'Keluar',
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    fontSize: size.width * 0.045,
+                    fontWeight: FontWeight.bold),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: darkRed,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
+                  backgroundColor: darkRed,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                   ),
                 ),
-              ),
+                ),
             ],
           ),
         ),
