@@ -41,6 +41,13 @@ class MainNavigator extends StatefulWidget {
 
   MainNavigator({Key? key}) : super(key: navigatorKey);
 
+  static void navigateTo(int index) {
+    final state = MainNavigator.navigatorKey.currentState;
+    if (state != null && state is _MainNavigatorState) {
+      state._navigateToPage(index);
+    }
+  }
+
   @override
   _MainNavigatorState createState() => _MainNavigatorState();
 }
@@ -61,24 +68,23 @@ class _MainNavigatorState extends State<MainNavigator> {
     _loadLastSelectedIndex();
   }
 
-  // Load the last selected index from SharedPreferences
   Future<void> _loadLastSelectedIndex() async {
-  final prefs = await SharedPreferences.getInstance();
-  final savedIndex = prefs.getInt('navbar_index') ?? 1; // Default to 1
-  setState(() {
-    _currentIndex = (savedIndex >= 0 && savedIndex < _pages.length) 
-        ? savedIndex 
-        : 1; // Ensure it falls within the valid range
-  });
-}
+    final prefs = await SharedPreferences.getInstance();
+    final savedIndex = prefs.getInt('navbar_index') ?? 1;
+    setState(() {
+      _currentIndex = (savedIndex >= 0 && savedIndex < _pages.length)
+          ? savedIndex
+          : 1;
+    });
+  }
 
-  // Save the selected index to SharedPreferences
   Future<void> _saveSelectedIndex(int index) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt('navbar_index', index);
   }
 
-   void navigateToPage(int index) async {
+
+  void _navigateToPage(int index) async {
     setState(() {
       _currentIndex = index;
     });
@@ -101,13 +107,11 @@ class _MainNavigatorState extends State<MainNavigator> {
             child: FloatingBottomNav(
               selectedIndex: _currentIndex,
               onTap: (index) async {
-                // Update state and save to SharedPreferences
                 setState(() {
                   _currentIndex = index;
                 });
                 await _saveSelectedIndex(index);
 
-                // Fetch user data
                 try {
                   final prefs = await SharedPreferences.getInstance();
                   final token = prefs.getString('token');
@@ -119,7 +123,6 @@ class _MainNavigatorState extends State<MainNavigator> {
                     throw Exception('Token not found');
                   }
                 } catch (e) {
-                  // Handle error
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('Failed to fetch user data: $e')),
                   );

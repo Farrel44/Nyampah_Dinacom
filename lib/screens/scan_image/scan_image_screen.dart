@@ -1,3 +1,5 @@
+import 'dart:math';
+import 'package:nyampah_app/main.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:nyampah_app/theme/colors.dart';
@@ -5,6 +7,8 @@ import 'package:nyampah_app/services/scan_service.dart';
 import 'dart:io';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import 'package:flutter_svg/flutter_svg.dart';
+
 
 class ScanImage extends StatefulWidget {
   const ScanImage({super.key});
@@ -113,7 +117,7 @@ class _ScanImageState extends State<ScanImage> with TickerProviderStateMixin {
                   ),
                   child: IconButton(
                     onPressed: () {
-                      // Add functionality here (e.g., go back or open a menu)
+                      MainNavigator.navigateTo(1);
                     },
                     icon: Icon(Icons.arrow_back, color: const Color.fromRGBO(0, 105, 62, 100)),
                     tooltip: 'Back',
@@ -408,9 +412,9 @@ class _TutorialDialogState extends State<TutorialDialog> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Expanded(
-                            child: Image.asset(
-                            'assets/images/tutorial_step_${index + 1}.png',
-                            fit: BoxFit.contain
+                            child: SvgPicture.asset(
+                              'assets/images/tutorial_step_${index + 1}.svg',
+                              fit: BoxFit.contain,
                             ),
                         ),
                         const SizedBox(height: 16),

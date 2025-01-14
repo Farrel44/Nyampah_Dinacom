@@ -301,7 +301,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               SizedBox(width: constraints.maxWidth * 0.12),
                               GestureDetector(
                                 onTap: () async {
-                                  MainNavigator.navigatorKey.currentState?.navigateToPage(4);
+                                  MainNavigator.navigateTo(4);
                                 },
                                 child: const Icon(
                                   Icons.chevron_right,

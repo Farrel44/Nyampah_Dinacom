@@ -585,6 +585,29 @@ class RedeemDialog extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(height: 20),
+                                Center(
+                                child: Text(
+                                  "Kode Voucher",
+                                  style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.green,
+                                  ),
+                                ),
+                                ),
+                                const SizedBox(height: 4),
+                                Center(
+                                child: Text(
+                                  redeemData?['data']['voucher'] ?? 'Unknown Voucher',
+                                  style: const TextStyle(
+                                  fontSize: 25,
+                                  fontFamily: 'Inter',
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey,
+                                  ),
+                                ),
+                                ),
+                              const SizedBox(height: 20),
                               Text(
                                 "Nama",
                                 style: TextStyle(
@@ -661,24 +684,7 @@ class RedeemDialog extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(height: 20),
-                              Text(
-                                "Kode Voucher",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.green,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                redeemData?['data']['voucher'] ?? 'Unknown Voucher',
-                                style: const TextStyle(
-                                  fontSize: 15,
-                                  fontFamily: 'Inter',
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.grey,
-                                ),
-                              ),
+                              
                             ],
                           ),
                         ),
