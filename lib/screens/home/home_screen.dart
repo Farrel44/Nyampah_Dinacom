@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:nyampah_app/theme/colors.dart';
 import 'package:nyampah_app/services/user_service.dart';
+import 'package:nyampah_app/screens/achievement/achievement_screen.dart';
 import 'package:nyampah_app/main.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -187,53 +188,69 @@ class _HomeScreenState extends State<HomeScreen> {
                             crossAxisAlignment:
                               CrossAxisAlignment.start,
                             children: [
-                              Text(
-                              '${user?['rank'] ?? 'Rank'}',
-                              style: TextStyle(
-                                color: greenColor,
-                                fontFamily: 'Inter',
-                                fontWeight: FontWeight.bold,
-                                fontSize: titleSize,
-                              ),
-                              ),
-                              SizedBox(
-                                height:
-                                  cardConstraints.maxHeight * 0.02),
-                              Text(
-                              '$points Points',
-                              style: TextStyle(
-                                color: greenWithOpacity,
-                                fontFamily: 'Inter',
-                                fontWeight: FontWeight.bold,
-                                fontSize: subtitleSize,
-                              ),
-                              ),
-                              SizedBox(
-                                height:
-                                  cardConstraints.maxHeight * 0.1),
-                              ClipRRect(
-                              borderRadius: BorderRadius.circular(
-                                progressBarHeight * 0.5),
-                              child: SizedBox(
-                                width: double.infinity,
-                                height: progressBarHeight,
-                                child: LinearProgressIndicator(
-                                value: calculateProgress(exp),
-                                color: greenColor,
-                                backgroundColor: greenWhite,
+                              TextButton(
+                              onPressed: () async {
+                                await Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const AchievementPage(),
+                                        ),
+                                      );
+                              },
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                Text(
+                                  '${user?['rank'] ?? 'Rank'}',
+                                  style: TextStyle(
+                                  color: greenColor,
+                                  fontFamily: 'Inter',
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: titleSize,
+                                  ),
                                 ),
-                              ),
-                              ),
-                              SizedBox(
-                                height:
-                                  cardConstraints.maxHeight * 0.04),
-                              Text(
-                              '${1000 - (exp % 1000)} Exp left to next rank',
-                              style: TextStyle(
-                                color: greenWithOpacity,
-                                fontFamily: 'Inter',
-                                fontWeight: FontWeight.bold,
-                                fontSize: subtitleSize,
+                                SizedBox(
+                                  height: cardConstraints.maxHeight * 0.02,
+                                ),
+                                Text(
+                                  '$points Points',
+                                  style: TextStyle(
+                                  color: greenWithOpacity,
+                                  fontFamily: 'Inter',
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: subtitleSize,
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: cardConstraints.maxHeight * 0.1,
+                                ),
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(
+                                  progressBarHeight * 0.5,
+                                  ),
+                                  child: SizedBox(
+                                  width: double.infinity,
+                                  height: progressBarHeight,
+                                  child: LinearProgressIndicator(
+                                    value: calculateProgress(exp),
+                                    color: greenColor,
+                                    backgroundColor: greenWhite,
+                                  ),
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: cardConstraints.maxHeight * 0.04,
+                                ),
+                                Text(
+                                  '${1000 - (exp % 1000)} Exp left to next rank',
+                                  style: TextStyle(
+                                  color: greenWithOpacity,
+                                  fontFamily: 'Inter',
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: subtitleSize,
+                                  ),
+                                ),
+                                ],
                               ),
                               ),
                             ],
@@ -334,7 +351,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       ClipOval(
                                       child: user['profile_image'] != null
                                         ? Image.network(
-                                          '$baseUrl/storage/${user['profile_image']}',
+                                            '$baseUrl/storage/${leaderboardData[index]['profile_image']}',
                                           width: constraints.maxWidth * 0.15,
                                           height: constraints.maxWidth * 0.15,
                                           fit: BoxFit.cover,
