@@ -134,8 +134,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
                                         content: Text(
-                                          'Kata sandi harus terdiri dari minimal 8 karakter, termasuk 1 huruf kecil, '
-                                          '1 huruf besar, dan 1 angka.',
+                                          'Kata sandi harus minimal 8 karakter, mengandung huruf besar, huruf kecil, angka, dan karakter spesial.'
                                         ),
                                       ),
                                     );

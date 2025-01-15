@@ -463,6 +463,21 @@ class VoucherDetailDialog extends StatelessWidget {
   }
 }
 
+String _getProcessedErrorMessage(dynamic error) {
+  try {
+    final parsedError = error as Map<String, dynamic>;
+    final data = parsedError['data'] as Map<String, dynamic>;
+    final errorDetails = data['error'];
+    if (errorDetails != null) {
+      return errorDetails.join(', '); // Menggabungkan array error jika ada
+    }
+  } catch (e) {
+    // Log atau tangani error parsing di sini
+    return 'Terjadi kesalahan tak terduga.';
+  }
+  return 'Terjadi kesalahan.';
+}
+
 class RedeemDialog extends StatelessWidget {
   final String token;
   final int voucherId;
@@ -472,6 +487,51 @@ class RedeemDialog extends StatelessWidget {
     required this.token,
     required this.voucherId,
   });
+
+
+  String _getErrorMessage(dynamic error) {
+  if (error != null) {
+    String errorStr = error.toString().toLowerCase();
+
+    try {
+      // Ekstrak JSON dari error jika ada
+      final jsonStart = errorStr.indexOf('{');
+      if (jsonStart != -1) {
+        final jsonString = errorStr.substring(jsonStart);
+        final errorJson = json.decode(jsonString);
+
+        // Periksa pesan error dalam field 'error' terlebih dahulu
+        final List<dynamic>? errorMessages = errorJson['data']?['error'];
+        if (errorMessages != null) {
+          for (var message in errorMessages) {
+            if (message.toString().toLowerCase().contains('poinmu gacukup')) {
+              return 'Poin mu tidak cukup untuk\nmenukar voucher ini';
+            }
+          }
+        }
+
+        // Jika tidak ada error spesifik, periksa status kode
+        if (errorJson['status_code'] == 500) {
+          return 'Terjadi kesalahan pada server';
+        }
+      }
+    } catch (e) {
+      // Jika parsing JSON gagal, lanjutkan ke pemeriksaan string biasa
+    }
+
+    // Pemeriksaan error string biasa
+    if (errorStr.contains('500')) {
+      return 'Terjadi kesalahan pada server';
+    } else if (errorStr.contains('insufficient') || 
+               errorStr.contains('poin tidak cukup') ||
+               errorStr.contains('points not enough') ||
+               errorStr.contains('poin tidak mencukupi') ||
+               errorStr.contains('poinmu gacukup')) {
+      return 'Poin mu tidak cukup untuk menukar voucher ini';
+    }
+  }
+  return 'Terjadi kesalahan saat menukar voucher';
+}
 
   @override
   Widget build(BuildContext context) {
@@ -510,14 +570,26 @@ class RedeemDialog extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    redeemSnapshot.error.toString(),
+                    _getErrorMessage(redeemSnapshot.error),
                     textAlign: TextAlign.center,
-                    style: const TextStyle(color: Colors.grey),
+                    style: const TextStyle(
+                      color: Colors.black,
+                      fontSize: 16,
+                      fontFamily: 'Inter',
+                    ),
                   ),
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    child: const Text('Tutup'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    ),
+                    child: const Text(
+                      'Tutup',
+                      style: TextStyle(
+                      color: Colors.white,),
+                      ),
                   ),
                 ],
               ),
