@@ -12,6 +12,7 @@ class HomeScreen extends StatefulWidget {
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
+
 }
 
 class _HomeScreenState extends State<HomeScreen> {
@@ -200,26 +201,51 @@ class _HomeScreenState extends State<HomeScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                Text(
-                                  '${user?['rank'] ?? 'Rank'}',
-                                  style: TextStyle(
-                                  color: greenColor,
-                                  fontFamily: 'Inter',
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: titleSize,
+                                Column(
+                                  children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                    SvgPicture.asset(
+                                      'assets/images/rank_${user?['rank']?.toLowerCase() ?? 'bronze'}.svg',
+                                      height: cardConstraints.maxHeight * 0.40,
+                                      fit: BoxFit.cover,
+                                      placeholderBuilder: (context) => Image.asset(
+                                      'assets/images/placeholder_image.png',
+                                      height: cardConstraints.maxHeight * 0.40,
+                                      fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                    SizedBox(width: basePadding),
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                      Text(
+                                        '${user?['rank'] ?? 'Rank'}',
+                                        style: TextStyle(
+                                        color: greenColor,
+                                        fontFamily: 'Inter',
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: titleSize,
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: cardConstraints.maxHeight * 0.02,
+                                      ),
+                                      Text(
+                                        '$points Poin',
+                                        style: TextStyle(
+                                        color: greenWithOpacity,
+                                        fontFamily: 'Inter',
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: subtitleSize,
+                                        ),
+                                      ),
+                                      ],
+                                    ),
+                                    ],
                                   ),
-                                ),
-                                SizedBox(
-                                  height: cardConstraints.maxHeight * 0.02,
-                                ),
-                                Text(
-                                  '$points Poin',
-                                  style: TextStyle(
-                                  color: greenWithOpacity,
-                                  fontFamily: 'Inter',
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: subtitleSize,
-                                  ),
+                                  ],
                                 ),
                                 SizedBox(
                                   height: cardConstraints.maxHeight * 0.1,
@@ -336,7 +362,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 return Padding(
                                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
                                 child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   Text(
@@ -386,24 +412,25 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                   ),
                                   Text(
-                                  'EXP: ${user['exp']}',
+                                  '${user['points']} Poin',
                                   style: TextStyle(
-                                    fontFamily: 'Inter',
-                                    fontWeight: FontWeight.bold,
-                                    color: greenWithOpacity,
-                                    fontSize: 14,
+                                  fontFamily: 'Inter',
+                                  fontWeight: FontWeight.bold,
+                                  color: greenWithOpacity,
+                                  fontSize: 14,
                                   ),
                                   ),
                                   ],
                                   ),
                                   const Spacer(),
+                                  
                                   Text(
-                                  '${user['points']} poin',
+                                  '${user['exp']} Exp',
                                   style: TextStyle(
-                                  fontFamily: 'Inter',
-                                  fontWeight: FontWeight.bold,
-                                  color: greenColor,
-                                  fontSize: 16,
+                                    fontFamily: 'Inter',
+                                    fontWeight: FontWeight.bold,
+                                    color: greenColor,
+                                    fontSize: 16,
                                   ),
                                   ),
                                 ],

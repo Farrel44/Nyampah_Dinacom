@@ -27,6 +27,7 @@ dependencies:
   google_maps_flutter: ^2.10.0
   google_places_flutter: ^2.0.9
   geolocator: ^13.0.2
+  tutorial_coach_mark: ^1.2.12
 
 dev_dependencies:
   flutter_test:
