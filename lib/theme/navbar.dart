@@ -1,15 +1,26 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:nyampah_app/theme/colors.dart';
+import 'package:nyampah_app/main.dart';
 
 class FloatingBottomNav extends StatelessWidget {
   final int selectedIndex;
   final Function(int) onTap;
+  final GlobalKey? voucherKey;
+  final GlobalKey? homeKey;
+  final GlobalKey? scanKey;
+  final GlobalKey? profileKey;
+  final GlobalKey? trashKey;
 
   const FloatingBottomNav({
     Key? key,
     required this.selectedIndex,
     required this.onTap,
+    this.voucherKey,
+    this.homeKey,
+    this.scanKey,
+    this.profileKey,
+    this.trashKey,
   }) : super(key: key);
 
   @override
@@ -45,28 +56,33 @@ class FloatingBottomNav extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   _NavItem(
+                    key: voucherKey,
                     label: 'Voucher',
                     icon: Icons.confirmation_number_outlined,
                     isSelected: selectedIndex == 0,
                     onTap: () => onTap(0),
                   ),
                   _NavItem(
+                    key: homeKey,
                     label: 'Home',
                     icon: Icons.home_outlined,
                     isSelected: selectedIndex == 1,
                     onTap: () => onTap(1),
                   ),
                   _CenterButton(
+                    key: scanKey,
                     isSelected: selectedIndex == 2,
                     onTap: () => onTap(2),
                   ),
                   _NavItem(
+                    key: profileKey,
                     label: 'Profile',
                     icon: Icons.person_outline,
                     isSelected: selectedIndex == 3,
                     onTap: () => onTap(3),
                   ),
                   _NavItem(
+                    key: trashKey,
                     label: 'Trash',
                     icon: CupertinoIcons.delete,
                     isSelected: selectedIndex == 4,
@@ -87,13 +103,15 @@ class _NavItem extends StatelessWidget {
   final bool isSelected;
   final VoidCallback onTap;
   final String label;
+  final GlobalKey? key;
 
   const _NavItem({
+    this.key,
     required this.icon,
     required this.isSelected,
     required this.onTap,
     required this.label,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -126,11 +144,13 @@ class _NavItem extends StatelessWidget {
 class _CenterButton extends StatelessWidget {
   final bool isSelected;
   final VoidCallback onTap;
+  final GlobalKey? key;
 
   const _CenterButton({
+    this.key,
     required this.isSelected,
     required this.onTap,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

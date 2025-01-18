@@ -197,49 +197,69 @@ class AchievementPageState extends State<AchievementPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(
-                          '${user?['rank'] ?? 'Peringkat'}',
-                          style: TextStyle(
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                        SvgPicture.asset(
+                          'assets/images/rank_${user?['rank']?.toLowerCase() ?? 'bronze'}.svg',
+                          height: cardConstraints.maxHeight * 0.40,
+                          fit: BoxFit.cover,
+                          placeholderBuilder: (context) => Image.asset(
+                          'assets/images/placeholder_image.png',
+                          height: cardConstraints.maxHeight * 0.40,
+                          fit: BoxFit.cover,
+                          ),
+                        ),
+                        SizedBox(width: basePadding),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                          Text(
+                            '${user?['rank'] ?? 'Peringkat'}',
+                            style: TextStyle(
                             color: greenColor,
                             fontFamily: 'Inter',
                             fontWeight: FontWeight.bold,
                             fontSize: titleSize,
-                          ),
-                        ),
-                        SizedBox(height: cardConstraints.maxHeight * 0.02),
-                        Text(
-                          '$points Poin',
-                          style: TextStyle(
-                            color: greenWithOpacity,
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.bold,
-                            fontSize: subtitleSize,
-                          ),
-                        ),
-                        SizedBox(height: cardConstraints.maxHeight * 0.1),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(
-                              progressBarHeight * 0.5),
-                          child: SizedBox(
-                            width: double.infinity,
-                            height: progressBarHeight,
-                            child: LinearProgressIndicator(
-                              value: calculateProgress(exp),
-                              color: greenColor,
-                              backgroundColor: greenWhite,
                             ),
                           ),
-                        ),
-                        SizedBox(height: cardConstraints.maxHeight * 0.04),
-                        Text(
-                          '${1000 - (exp % 1000)} Exp tersisa ke peringkat berikutnya',
-                          style: TextStyle(
+                          SizedBox(height: cardConstraints.maxHeight * 0.02),
+                          Text(
+                            '$points Poin',
+                            style: TextStyle(
                             color: greenWithOpacity,
                             fontFamily: 'Inter',
                             fontWeight: FontWeight.bold,
                             fontSize: subtitleSize,
+                            ),
                           ),
+                          ],
                         ),
+                        ],
+                      ),
+                      SizedBox(height: cardConstraints.maxHeight * 0.1),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(progressBarHeight * 0.5),
+                        child: SizedBox(
+                        width: double.infinity,
+                        height: progressBarHeight,
+                        child: LinearProgressIndicator(
+                          value: calculateProgress(exp),
+                          color: greenColor,
+                          backgroundColor: greenWhite,
+                        ),
+                        ),
+                      ),
+                      SizedBox(height: cardConstraints.maxHeight * 0.04),
+                      Text(
+                        '${1000 - (exp % 1000)} Exp tersisa ke peringkat berikutnya',
+                        style: TextStyle(
+                        color: greenWithOpacity,
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.bold,
+                        fontSize: subtitleSize,
+                        ),
+                      ),
                       ],
                     );
                   },

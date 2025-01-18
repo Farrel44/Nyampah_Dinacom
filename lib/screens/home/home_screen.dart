@@ -7,15 +7,18 @@ import 'package:nyampah_app/services/user_service.dart';
 import 'package:nyampah_app/screens/achievement/achievement_screen.dart';
 import 'package:nyampah_app/main.dart';
 
+
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final GlobalKey achievementKey;
+
+  const HomeScreen({Key? key, required this.achievementKey}) : super(key: key); // Accept the key in the constructor
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
-
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  
   Map<String, dynamic>? user;
   String? token;
   Future<List<Map<String, dynamic>>>? leaderboardFuture;
@@ -42,13 +45,14 @@ class _HomeScreenState extends State<HomeScreen> {
         token = userToken;
         leaderboardFuture = UserService.getLeaderboard(token!);
       });
+
     }
 
     setState(() {
       _isLoading = false;
     });
   }
-
+  
   Future<void> refreshLeaderboard() async {
     setState(() {
       leaderboardFuture = UserService.getLeaderboard(token!);
@@ -87,6 +91,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: SafeArea(
                       child: Column(
                       children: [
+                        //achievement card
                         Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -206,21 +211,24 @@ class _HomeScreenState extends State<HomeScreen> {
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
-                                    SvgPicture.asset(
-                                      'assets/images/rank_${user?['rank']?.toLowerCase() ?? 'bronze'}.svg',
-                                      height: cardConstraints.maxHeight * 0.40,
-                                      fit: BoxFit.cover,
-                                      placeholderBuilder: (context) => Image.asset(
-                                      'assets/images/placeholder_image.png',
-                                      height: cardConstraints.maxHeight * 0.40,
-                                      fit: BoxFit.cover,
-                                      ),
-                                    ),
-                                    SizedBox(width: basePadding),
-                                    Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                    Row(
+                                        key: widget.achievementKey,
                                       children: [
-                                      Text(
+                                      SvgPicture.asset(
+                                        'assets/images/rank_${user?['rank']?.toLowerCase() ?? 'bronze'}.svg',
+                                        height: cardConstraints.maxHeight * 0.40,
+                                        fit: BoxFit.cover,
+                                        placeholderBuilder: (context) => Image.asset(
+                                        'assets/images/placeholder_image.png',
+                                        height: cardConstraints.maxHeight * 0.40,
+                                        fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                      SizedBox(width: basePadding),
+                                      Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                        Text(
                                         '${user?['rank'] ?? 'Rank'}',
                                         style: TextStyle(
                                         color: greenColor,
@@ -228,11 +236,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                         fontWeight: FontWeight.bold,
                                         fontSize: titleSize,
                                         ),
-                                      ),
-                                      SizedBox(
+                                        ),
+                                        SizedBox(
                                         height: cardConstraints.maxHeight * 0.02,
-                                      ),
-                                      Text(
+                                        ),
+                                        Text(
                                         '$points Poin',
                                         style: TextStyle(
                                         color: greenWithOpacity,
@@ -240,13 +248,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                         fontWeight: FontWeight.bold,
                                         fontSize: subtitleSize,
                                         ),
+                                        ),
+                                        ],
+                                      ),
+                                      ],
                                       ),
                                       ],
                                     ),
                                     ],
-                                  ),
-                                  ],
-                                ),
+                                    ),
                                 SizedBox(
                                   height: cardConstraints.maxHeight * 0.1,
                                 ),
@@ -309,29 +319,38 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                               child: Row(
                               children: [
-                                Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: ClipRRect(
-                                  child: SvgPicture.asset(
-                                  'assets/images/leaderboard.svg',
-                                  width: constraints.maxWidth * 0.06,
-                                  height: constraints.maxWidth * 0.06,
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                  Row(
+                                    children: [
+                                    Container(
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: ClipRRect(
+                                      child: SvgPicture.asset(
+                                      'assets/images/leaderboard.svg',
+                                      width: constraints.maxWidth * 0.06,
+                                      height: constraints.maxWidth * 0.06,
+                                      ),
+                                    ),
+                                    ),
+                                    SizedBox(
+                                      width: constraints.maxWidth * 0.04),
+                                    const Text(
+                                    'Leaderboard',
+                                    style: TextStyle(
+                                      fontFamily: 'Inter',
+                                      fontSize: 24,
+                                      color: greenColor,
+                                      fontWeight: FontWeight.bold),
+                                    ),
+                                    ],
                                   ),
-                                ),
-                                ),
-                                SizedBox(
-                                  width: constraints.maxWidth * 0.04),
-                                const Text(
-                                'Leaderboard',
-                                style: TextStyle(
-                                  fontFamily: 'Inter',
-                                  fontSize: 24,
-                                  color: greenColor,
-                                  fontWeight: FontWeight.bold),
+                                  ],
                                 ),
                                 IconButton(
                                 icon: const Icon(Icons.refresh, color: greenColor),
