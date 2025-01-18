@@ -73,8 +73,26 @@ class _ProfilePageState extends State<ProfilePage> {
         }
       }
     } catch (e) {
-      // Handle error
-      print('Gagal memperbarui profil');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                Icon(Icons.error_outline, color: Colors.white),
+                SizedBox(width: 8),
+                Text('Gagal memperbarui profil'),
+              ],
+            ),
+            backgroundColor: darkRed,
+            duration: Duration(seconds: 3),
+            behavior: SnackBarBehavior.floating,
+            margin: EdgeInsets.all(16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        );
+      }
     } finally {
       if (mounted) {
         setState(() {

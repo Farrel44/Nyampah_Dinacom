@@ -44,7 +44,7 @@ class MainNavigator extends StatefulWidget {
 
   static void navigateTo(int index) {
     final state = MainNavigator.navigatorKey.currentState;
-    if (state != null && state is _MainNavigatorState) {
+    if (state != null) {
       state._navigateToPage(index);
     }
   }

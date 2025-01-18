@@ -82,8 +82,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     (constraints.maxWidth * 0.045).clamp(16.0, 18.0);
                   final double usernameTextSize =
                     (constraints.maxWidth * 0.07).clamp(24.0, 28.0);
-                  final double profileImageSize =
-                    (constraints.maxWidth * 0.18).clamp(60.0, 70.0);
 
                   return SingleChildScrollView(
                     child: Padding(
@@ -377,7 +375,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                 itemCount: leaderboardData.length,
                                 itemBuilder: (context, index) {
                                 final user = leaderboardData[index];
-                                print("profile image : $baseUrl/storage/$user['profile_image']");
                                 return Padding(
                                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
                                 child: Row(
